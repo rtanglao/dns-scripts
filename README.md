@@ -26,13 +26,32 @@ uv run verify_thundermail_dns.py glamrocnamecheap.com
 ```
 
 Exit status is `0` only when every expected record is present and correct, so it's
-safe to use in scripts or CI. It queries `1.1.1.1` by default (override with the
-`DNS_RESOLVER` environment variable) to avoid stale local caches. `DNS_RESOLVER`
-accepts an IP address or a hostname — e.g. point it at an authoritative nameserver
-to bypass public-resolver caching entirely:
+safe to use in scripts or CI. It queries `1.1.1.1` by default (override with
+`--resolver` or the `DNS_RESOLVER` environment variable) to avoid stale local
+caches. The resolver accepts an IP address or a hostname — e.g. point it at an
+authoritative nameserver to bypass public-resolver caching entirely:
 
 ```sh
-DNS_RESOLVER=dns1.registrar-servers.com uv run verify_thundermail_dns.py glamrocnamecheap.com
+uv run verify_thundermail_dns.py glamrocnamecheap.com --resolver dns1.registrar-servers.com
+```
+
+### Fixing failures
+
+Pass `--provider` to print, for each **failing** record, exactly what to enter in
+that DNS provider's control panel — including provider-specific quirks such as how
+the Host/Name field is written. Supported: `namecheap`, `generic`.
+
+```sh
+uv run verify_thundermail_dns.py glamrocnamecheap.com --provider namecheap
+```
+
+For example, a missing DKIM CNAME prints:
+
+```
+• CNAME tm1._domainkey
+  Namecheap → Advanced DNS → Add New Record → CNAME Record:
+      Host:  tm1._domainkey
+      Value: tm1.glamrocnamecheap.com.dkim.thunderhosted.com   (no trailing dot)
 ```
 
 ### Example
