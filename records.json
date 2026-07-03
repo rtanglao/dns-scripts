@@ -1,0 +1,81 @@
+{
+  "mail_target": "mail.thundermail.com",
+  "records": [
+    {"type": "MX", "host": "@", "priority": 10, "target": "mail.thundermail.com"},
+    {"type": "SRV", "host": "_jmap._tcp", "priority": 0, "weight": 1, "port": 443, "target": "mail.thundermail.com"},
+    {"type": "SRV", "host": "_caldavs._tcp", "priority": 0, "weight": 1, "port": 443, "target": "mail.thundermail.com"},
+    {"type": "SRV", "host": "_carddavs._tcp", "priority": 0, "weight": 1, "port": 443, "target": "mail.thundermail.com"},
+    {"type": "SRV", "host": "_imaps._tcp", "priority": 0, "weight": 1, "port": 993, "target": "mail.thundermail.com"},
+    {"type": "SRV", "host": "_submission._tcp", "priority": 0, "weight": 1, "port": 587, "target": "mail.thundermail.com"},
+    {"type": "TXT", "host": "@", "label": "@ (SPF)", "value": "v=spf1 include:spf.thundermail.com -all", "match": "v=spf1 include:spf.thundermail.com -all"},
+    {"type": "TXT", "host": "_mta-sts", "value": "v=STSv1; id=18139500144460329770", "match": "v=STSv1;"},
+    {"type": "TXT", "host": "_smtp._tls", "value": "v=TLSRPTv1; rua=mailto:postmaster@{domain}", "match": "v=TLSRPTv1;"},
+    {"type": "TXT", "host": "_dmarc", "value": "v=DMARC1; p=none;", "match": "v=DMARC1;"},
+    {"type": "CNAME", "host": "tm1._domainkey", "target": "tm1.{domain}.dkim.thunderhosted.com"},
+    {"type": "CNAME", "host": "tm2._domainkey", "target": "tm2.{domain}.dkim.thunderhosted.com"},
+    {"type": "CNAME", "host": "tm3._domainkey", "target": "tm3.{domain}.dkim.thunderhosted.com"}
+  ],
+  "group_headers": {"MX": "MX:", "SRV": "SRV:", "TXT": "TXT:", "CNAME": "CNAME (DKIM):"},
+  "value_templates": {
+    "MX": {"match": "{priority} {target}", "value": "{target}"},
+    "SRV": {"match": "{priority} {weight} {port} {target}", "value": "{weight} {port} {target}"},
+    "TXT": {"match": "{match}", "value": "{value}"},
+    "CNAME": {"match": "{target}", "value": "{target}"}
+  },
+  "providers": {
+    "namecheap": {
+      "MX": {
+        "header": "Namecheap → Advanced DNS → Mail Settings: set 'Custom MX', then add:",
+        "fields": [["Type", "MX Record"], ["Host", "{host}"], ["Value", "{target}"], ["Priority", "{priority}"]]
+      },
+      "SRV": {
+        "header": "Namecheap → Advanced DNS → Add New Record → SRV Record:",
+        "fields": [["Host", "{host}"], ["Priority", "{priority}"], ["Weight", "{weight}"], ["Port", "{port}"], ["Target", "{target}"]]
+      },
+      "TXT": {
+        "header": "Namecheap → Advanced DNS → Add New Record → TXT Record:",
+        "fields": [["Host", "{host}"], ["Value", "{value}"]]
+      },
+      "CNAME": {
+        "header": "Namecheap → Advanced DNS → Add New Record → CNAME Record:",
+        "fields": [["Host", "{host}"], ["Value", "{value}   (no trailing dot)"]]
+      }
+    },
+    "squarespace": {
+      "MX": {
+        "header": "Squarespace → Domains → your domain → DNS → Custom Records → add:",
+        "fields": [["Type", "MX"], ["Name", "{host}"], ["Priority", "{priority}"], ["Data", "{target}"]]
+      },
+      "SRV": {
+        "header": "Squarespace → Domains → your domain → DNS → Custom Records → add:",
+        "fields": [["Type", "SRV"], ["Name", "{host}"], ["Priority", "{priority}"], ["Data", "{value}"]]
+      },
+      "TXT": {
+        "header": "Squarespace → Domains → your domain → DNS → Custom Records → add:",
+        "fields": [["Type", "TXT"], ["Name", "{host}"], ["Data", "{value}"]]
+      },
+      "CNAME": {
+        "header": "Squarespace → Domains → your domain → DNS → Custom Records → add:",
+        "fields": [["Type", "CNAME"], ["Name", "{host}"], ["Data", "{value}"]]
+      }
+    },
+    "generic": {
+      "MX": {
+        "header": "Add this DNS record:",
+        "fields": [["Type", "MX"], ["Name", "{fqdn}"], ["Value", "{match}"], ["Priority", "{priority}"]]
+      },
+      "SRV": {
+        "header": "Add this DNS record:",
+        "fields": [["Type", "SRV"], ["Name", "{fqdn}"], ["Value", "{match}"], ["Priority", "{priority}"]]
+      },
+      "TXT": {
+        "header": "Add this DNS record:",
+        "fields": [["Type", "TXT"], ["Name", "{fqdn}"], ["Value", "{match}"]]
+      },
+      "CNAME": {
+        "header": "Add this DNS record:",
+        "fields": [["Type", "CNAME"], ["Name", "{fqdn}"], ["Value", "{match}"]]
+      }
+    }
+  }
+}

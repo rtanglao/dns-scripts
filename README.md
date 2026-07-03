@@ -7,6 +7,26 @@ Small utilities for checking DNS records.
 
 Licensed under [MPL-2.0](LICENSE).
 
+## Thundermail DNS checker — web version
+
+**<https://rtanglao.github.io/dns-scripts/>**
+
+The same checks as the `verify_thundermail_dns.py` CLI below, but from a web
+browser: enter a domain, optionally pick your DNS provider, and get pass/fail per
+record plus exactly what to enter for any that are missing. All lookups run
+client-side via DNS-over-HTTPS (Cloudflare or Google) — no server, nothing stored.
+
+Run it locally with any static file server:
+
+```sh
+python3 -m http.server 8000   # then open http://localhost:8000/
+```
+
+> **Single source of truth:** the record set, value templates, and per-provider
+> remediation strings live in [`records.json`](records.json), which is read by
+> *both* the CLI and the web page (`index.html` + `app.js`). Add a record or a
+> provider there once and both front-ends pick it up.
+
 ## Setup
 
 Managed with [`uv`](https://docs.astral.sh/uv/):
