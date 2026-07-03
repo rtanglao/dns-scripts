@@ -16,7 +16,7 @@ Exit status is 0 only if every expected record is present and correct.
 
 Pass --provider to print, for each FAILING record, exactly what to enter in that
 DNS provider's control panel (accounting for provider quirks such as how the
-Host/Name field is written). Supported: namecheap, generic.
+Host/Name field is written). Supported: namecheap, squarespace, generic.
 
 The resolver defaults to 1.1.1.1 (override with --resolver or DNS_RESOLVER) to
 avoid stale local caches. The value may be an IP address or a hostname (e.g. an
@@ -167,6 +167,41 @@ def fix_namecheap(rec: dict, domain: str) -> list[str]:
     raise ValueError(f"unknown record type {t!r}")
 
 
+def fix_squarespace(rec: dict, domain: str) -> list[str]:
+    """How to enter `rec` in Squarespace's DNS custom-records editor.
+
+    Squarespace calls the sub-name field 'Name' ('@' for the apex, the sub-name
+    only for subdomains — it appends the domain). MX/SRV have a separate Priority
+    field; for SRV the 'Data' field holds 'weight port target' (space-separated).
+    """
+    prefix = "Squarespace → Domains → your domain → DNS → Custom Records → add:"
+    t = rec["type"]
+    if t == "MX":
+        return [
+            prefix,
+            "    Type:     MX",
+            f"    Name:     {rec['host']}",
+            f"    Priority: {rec['priority']}",
+            f"    Data:     {rec['target']}",
+        ]
+    if t == "SRV":
+        return [
+            prefix,
+            "    Type:     SRV",
+            f"    Name:     {rec['host']}",
+            f"    Priority: {rec['priority']}",
+            f"    Data:     {full_value(rec, domain)}",
+        ]
+    if t in ("TXT", "CNAME"):
+        return [
+            prefix,
+            f"    Type: {t}",
+            f"    Name: {rec['host']}",
+            f"    Data: {full_value(rec, domain)}",
+        ]
+    raise ValueError(f"unknown record type {t!r}")
+
+
 def fix_generic(rec: dict, domain: str) -> list[str]:
     """Provider-neutral record description (FQDN name, trailing dot)."""
     name = domain + "." if rec["host"] == "@" else f"{rec['host']}.{domain}."
@@ -182,7 +217,11 @@ def fix_generic(rec: dict, domain: str) -> list[str]:
     return lines
 
 
-PROVIDERS = {"namecheap": fix_namecheap, "generic": fix_generic}
+PROVIDERS = {
+    "namecheap": fix_namecheap,
+    "squarespace": fix_squarespace,
+    "generic": fix_generic,
+}
 
 
 # --- Verification --------------------------------------------------------------
@@ -236,8 +275,8 @@ def main() -> int:
             for line in fixer(rec, args.domain):
                 print(f"  {line}")
     elif failures:
-        print("\nRe-run with --provider namecheap (or --provider generic) to see "
-              "exactly what to enter.")
+        choices = ", ".join(sorted(PROVIDERS))
+        print(f"\nRe-run with --provider ({choices}) to see exactly what to enter.")
 
     return 0 if not failures else 1
 

@@ -39,7 +39,7 @@ uv run verify_thundermail_dns.py glamrocnamecheap.com --resolver dns1.registrar-
 
 Pass `--provider` to print, for each **failing** record, exactly what to enter in
 that DNS provider's control panel — including provider-specific quirks such as how
-the Host/Name field is written. Supported: `namecheap`, `generic`.
+the Host/Name field is written. Supported: `namecheap`, `squarespace`, `generic`.
 
 ```sh
 uv run verify_thundermail_dns.py glamrocnamecheap.com --provider namecheap
