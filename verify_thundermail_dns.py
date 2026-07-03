@@ -47,6 +47,32 @@ RESET = "\033[0m"
 
 _TOKEN = re.compile(r"\{(\w+)\}")
 
+# Control / terminal-escape bytes to neutralise in any DNS-derived text before
+# printing (C0 minus \t\n\r, DEL, and C1). A domain owner controls their record
+# contents, so this closes an ANSI-escape-injection path into the terminal.
+_CTRL = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]")
+
+# Hostname validation (kept in sync with the same regex in app.js). Applied to
+# user-supplied domains before any lookup.
+_HOSTNAME = re.compile(
+    r"^(?=.{1,253}$)(?!-)[A-Za-z0-9-]{1,63}(?<!-)(\.(?!-)[A-Za-z0-9-]{1,63}(?<!-))+$"
+)
+
+_MAX_VALUE = 200  # cap displayed answer length to avoid pathological output
+
+
+def sanitize(s: str) -> str:
+    """Escape control/terminal chars so untrusted DNS data can't drive the tty."""
+    return _CTRL.sub(lambda m: f"\\x{ord(m.group()):02x}", s)
+
+
+def valid_domain(domain: str) -> bool:
+    return bool(_HOSTNAME.match(domain))
+
+
+def cap(s: str) -> str:
+    return s if len(s) <= _MAX_VALUE else s[:_MAX_VALUE] + "…"
+
 
 def label(rec: dict) -> str:
     return rec.get("label", rec["host"])
@@ -107,7 +133,7 @@ def query(resolver: dns.resolver.Resolver, name: str, rdtype: str) -> list[str]:
         answers = resolver.resolve(name, rdtype)
     except (dns.resolver.NXDOMAIN, dns.resolver.NoAnswer, dns.exception.DNSException):
         return []
-    return [answer.to_text().strip('"').rstrip(".") for answer in answers]
+    return [sanitize(answer.to_text().strip('"').rstrip(".")) for answer in answers]
 
 
 def main() -> int:
@@ -130,9 +156,15 @@ def main() -> int:
     )
     args = parser.parse_args()
 
+    domain = args.domain.strip().rstrip(".")
+    if not valid_domain(domain):
+        print(f"error: {sanitize(args.domain)!r} is not a valid domain name",
+              file=sys.stderr)
+        return 2
+
     resolver = build_resolver(args.resolver)
 
-    print(f"Verifying Thundermail DNS for {args.domain} (resolver {args.resolver})\n")
+    print(f"Verifying Thundermail DNS for {domain} (resolver {sanitize(args.resolver)})\n")
 
     passed = 0
     failures = []
@@ -142,18 +174,19 @@ def main() -> int:
             current_group = rec["type"]
             print(cfg["group_headers"][current_group])
 
-        ctx = resolve_record(rec, args.domain)
+        ctx = resolve_record(rec, domain)
         # Enrich with the derived match/value strings so provider templates can
         # reference {match} / {value} uniformly across record types.
         expected = ctx["match"] = value_of(ctx, cfg, "match")
         ctx["value"] = value_of(ctx, cfg, "value")
         actual = " / ".join(query(resolver, ctx["qname"], rec["type"]))
+        shown = cap(actual)  # match on the full answer; display a bounded slice
         if expected.lower() in actual.lower():
-            print(f"  {GREEN}OK{RESET}   {label(rec):<46} {actual}")
+            print(f"  {GREEN}OK{RESET}   {label(rec):<46} {shown}")
             passed += 1
         else:
             print(f"  {RED}FAIL{RESET} {label(rec):<46} expected to contain: {expected}")
-            print(f"       {'':<46} got: {actual or '<empty>'}")
+            print(f"       {'':<46} got: {shown or '<empty>'}")
             failures.append(ctx)
 
     print(f"\nResult: {passed} passed, {len(failures)} failed.")

@@ -8,6 +8,12 @@
 
 const TOKEN = /\{(\w+)\}/g;
 
+// Hostname validation (kept in sync with the same regex in verify_thundermail_dns.py).
+const HOSTNAME = /^(?=.{1,253}$)(?!-)[A-Za-z0-9-]{1,63}(?<!-)(\.(?!-)[A-Za-z0-9-]{1,63}(?<!-))+$/;
+
+const MAX_VALUE = 300; // cap displayed answer length to avoid DOM bloat
+const cap = (s) => (s.length <= MAX_VALUE ? s : s.slice(0, MAX_VALUE) + "…");
+
 // Numeric DNS type codes, to keep only answers of the requested type (a DoH
 // response can also carry CNAMEs from a resolution chain).
 const TYPE_NUM = { A: 1, CNAME: 5, MX: 15, TXT: 16, SRV: 33 };
@@ -105,6 +111,13 @@ async function runCheck(evt) {
   const provider = $("provider").value;
   const resolver = $("resolver").value;
 
+  if (!HOSTNAME.test(domain)) {
+    $("results").replaceChildren();
+    $("fixes").replaceChildren();
+    $("summary").textContent = `“${domain}” is not a valid domain name.`;
+    return;
+  }
+
   $("check").disabled = true;
   $("summary").textContent = `Checking ${domain}…`;
   $("results").replaceChildren();
@@ -141,11 +154,11 @@ async function runCheck(evt) {
       row.appendChild(el("span", `badge ${ok ? "ok" : "fail"}`, ok ? "OK" : "FAIL"));
       row.appendChild(el("span", "rlabel", labelOf(rec)));
       if (ok) {
-        row.appendChild(el("span", "rval", actual));
+        row.appendChild(el("span", "rval", cap(actual)));
         passed++;
       } else {
         row.appendChild(el("span", "rval miss",
-          `expected: ${expected}  —  got: ${actual || "(nothing)"}`));
+          `expected: ${expected}  —  got: ${cap(actual) || "(nothing)"}`));
         failures.push(ctx);
       }
       groupEl.appendChild(row);

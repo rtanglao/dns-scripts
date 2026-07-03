@@ -6,6 +6,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Defense-in-depth: lock scripts to same-origin, network to the two DoH
+       endpoints (+ same-origin records.json). GitHub Pages can't set headers,
+       so this is delivered as a meta tag. -->
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'none'; script-src 'self'; style-src 'unsafe-inline'; connect-src 'self' https://cloudflare-dns.com https://dns.google; img-src 'self'; base-uri 'none'; form-action 'none'">
   <title>Thundermail DNS checker</title>
   <style>
     :root {
