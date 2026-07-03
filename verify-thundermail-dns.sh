@@ -36,11 +36,11 @@ check() {
   local actual="$*"
   if grep -qiF -- "$expected" <<<"$actual"; then
     printf '  \033[32mOK\033[0m   %-46s %s\n' "$label" "$actual"
-    ((pass++))
+    pass=$((pass + 1))
   else
     printf '  \033[31mFAIL\033[0m %-46s expected to contain: %s\n' "$label" "$expected"
     printf '       %-46s got: %s\n' "" "${actual:-<empty>}"
-    ((fail++))
+    fail=$((fail + 1))
   fi
 }
 
