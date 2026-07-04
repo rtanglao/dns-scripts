@@ -9,7 +9,7 @@ Licensed under [MPL-2.0](LICENSE).
 
 ## Thundermail DNS checker — web version
 
-**<https://rtanglao.github.io/dns-scripts/>**
+**<https://thunderbird.github.io/dns-scripts/>**
 
 The same checks as the `verify_thundermail_dns.py` CLI below, but from a web
 browser: enter a domain, optionally pick your DNS provider, and get pass/fail per
