@@ -43,11 +43,30 @@ not guessed and not scraped by an automated tool.** Two reasons:
    **no SRV section at all**. A screenshot caught all of that; the docs alone would
    have led us wrong.
 
-**Best source, in order:** a **screenshot of the live panel** (the record-list view
-*and* an "add record" form — they reveal column labels, how the root/apex host is
-written, and trailing-dot handling) → reading the docs in a **real browser** →
-last resort, the provider's published docs quoted verbatim. When you land the
-provider, cite the docs you used (see the Cosmotown links in `README.md`).
+**The ideal artifact packet, in priority order:**
+
+1. **A screenshot of the "add / edit record" form** — the modal or panel where you
+   actually type a new record, ideally with the **record-type dropdown expanded**.
+   This is the single most valuable thing: the expanded dropdown reveals which
+   types the panel supports (that's how we'd have known up front that Cosmotown has
+   no SRV option), and the form shows the exact *input* field labels the remediation
+   strings must mirror. One example each for MX / SRV / TXT / CNAME is ideal.
+2. **A screenshot of the record-list view** with real records (like the one that
+   drove the Cosmotown block). Shows column labels and how values are *stored /
+   normalized* — trailing dots, auto-added quotes, and whether the root shows as
+   blank / `@` / the full domain.
+3. **A zone-file / BIND export or bulk-import view**, if the provider offers one —
+   disambiguates FQDNs, trailing dots, and TTLs in one shot. Rare, but gold.
+4. **The docs as rendered text or a PDF** (Print → Save as PDF), *not* HTML source —
+   raw HTML is noisy, and for Cloudflare-protected help sites you'd just be capturing
+   the challenge page. Docs are a supplement to the screenshots and are mainly needed
+   so you can **cite** them (see the Cosmotown links in `README.md`).
+5. **The provider name and docs URL**, for the citation and the header wording.
+
+A screenshot from a real customer's panel is perfect — just **redact** any
+account / billing / personal chrome first (the DNS records themselves are fine).
+Reading the docs in a real browser is the fallback when a screenshot isn't
+available; automated fetches are the last resort and usually the least reliable.
 
 ### Before you open a PR
 
