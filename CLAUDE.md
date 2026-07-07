@@ -38,7 +38,12 @@ The checked set is 13 records: 1 MX, 5 SRV (jmap/caldavs/carddavs/imaps/submissi
 - **Web lookups use public DoH** (Cloudflare `cloudflare-dns.com/dns-query` with
   `accept: application/dns-json`, or Google `dns.google/resolve`). Public resolvers
   cache negative answers, so a freshly-added record can lag; the **CLI can query an
-  authoritative NS directly** to bypass: `--resolver dns1.registrar-servers.com`.
+  authoritative NS directly** to bypass: `--resolver dns1.registrar-servers.com`
+  (Namecheap). **Check the domain's actual delegation first** (`dig NS <domain>`) —
+  Cosmotown, for example, runs two nameserver families: `ns1..ns4.cosmotown.com`
+  (Cloudflare-fronted) and `ndns1`/`ndns2.cosmotown.com` (AWS). A domain lives on
+  only one; querying the wrong one returns `REFUSED` (shows up as `<empty>` for
+  every record). Cosmotown example: `--resolver ndns1.cosmotown.com`.
 - **Provider field conventions were verified against each provider's docs, not
   guessed** (e.g. Namecheap splits SRV into Host/Priority/Weight/Port/Target;
   Squarespace uses Name + a separate Priority + `Data` = "weight port target").

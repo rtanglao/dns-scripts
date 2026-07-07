@@ -55,6 +55,15 @@ authoritative nameserver to bypass public-resolver caching entirely:
 uv run verify_thundermail_dns.py glamrocnamecheap.com --resolver dns1.registrar-servers.com
 ```
 
+Point it at whichever nameserver is actually authoritative for the domain — check
+with `dig NS <domain>` first, since a registrar may run several nameserver sets and
+querying the wrong one just returns empty answers. For example, a domain hosted on
+Cosmotown's DNS is usually delegated to `ndns1.cosmotown.com` / `ndns2.cosmotown.com`:
+
+```sh
+uv run verify_thundermail_dns.py <domain> --resolver ndns1.cosmotown.com
+```
+
 ### Fixing failures
 
 Pass `--provider` to print, for each **failing** record, exactly what to enter in
