@@ -59,6 +59,24 @@
         "fields": [["Type", "CNAME"], ["Name", "{host}"], ["Data", "{value}"]]
       }
     },
+    "cosmotown": {
+      "MX": {
+        "header": "[UNTESTED — verify against a live Cosmotown panel] Cosmotown → Domains → (check the box) → Manage Domains → DNS (Zone File) Records → add. Leave Host blank for the root domain (do NOT type @); enter the target with no trailing period; priority as 10, 20, ...:",
+        "fields": [["Type", "MX"], ["Host", "(leave blank)"], ["Value", "{target}"], ["Priority", "{priority}"]]
+      },
+      "SRV": {
+        "header": "[UNTESTED — verify against a live Cosmotown panel] Cosmotown's customer panel cannot add SRV records — contact Cosmotown support and ask them to add this SRV record for you:",
+        "fields": [["Host", "{host}"], ["Priority", "{priority}"], ["Weight", "{weight}"], ["Port", "{port}"], ["Target", "{target}"]]
+      },
+      "TXT": {
+        "header": "[UNTESTED — verify against a live Cosmotown panel] Cosmotown → DNS (Zone File) Records → add a TXT record. For the root domain leave Host blank (do NOT type @); preserve the value's exact upper/lowercase:",
+        "fields": [["Type", "TXT"], ["Host", "{host}"], ["Value", "{value}"]]
+      },
+      "CNAME": {
+        "header": "[UNTESTED — verify against a live Cosmotown panel] Cosmotown → DNS (Zone File) Records → add a CNAME record (enter the target with no trailing period):",
+        "fields": [["Type", "CNAME"], ["Host", "{host}"], ["Value", "{target}"]]
+      }
+    },
     "generic": {
       "MX": {
         "header": "Add this DNS record:",

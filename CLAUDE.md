@@ -21,7 +21,8 @@ The checked set is 13 records: 1 MX, 5 SRV (jmap/caldavs/carddavs/imaps/submissi
 
 - **Single source of truth = `records.json`.** It holds the record set,
   `value_templates` (how each type's expected/full value string is built), and the
-  per-provider remediation strings (`namecheap`, `squarespace`, `generic`). BOTH
+  per-provider remediation strings (`namecheap`, `squarespace`, `cosmotown`,
+  `generic`). BOTH
   front-ends read it, so they can never drift. **Add a record or a provider once in
   `records.json` and both the CLI and the web app pick it up** — do not hardcode
   records/strings in the Python or JS.
@@ -48,6 +49,12 @@ The checked set is 13 records: 1 MX, 5 SRV (jmap/caldavs/carddavs/imaps/submissi
   guessed** (e.g. Namecheap splits SRV into Host/Priority/Weight/Port/Target;
   Squarespace uses Name + a separate Priority + `Data` = "weight port target").
   Provider menu wording may drift — re-verify if a user reports it's off.
+  **Exception: `cosmotown` is derived from Cosmotown's help docs but NOT yet
+  confirmed against a live panel** — its headers carry an `[UNTESTED]` marker.
+  Notable doc-sourced quirks baked in: MX Host is left blank (no `@`) and targets
+  take no trailing period; TXT values are case-sensitive; and **SRV records can't be
+  added via the customer panel at all** — that block routes the user to Cosmotown
+  support instead. Drop the `[UNTESTED]` marker once someone verifies it live.
 
 ## Security posture
 
@@ -83,7 +90,7 @@ Exit status is `0` only when all 13 records are present and correct.
 
 - **CLI regression:** normal-input output should stay byte-identical across
   refactors. Capture `glamrocnamecheap.com` (expect 13/13, exit 0) and
-  `example.com --provider namecheap|squarespace|generic` before a change, then
+  `example.com --provider namecheap|squarespace|cosmotown|generic` before a change, then
   `diff` after. Also test invalid/malicious domains → rejected with exit 2.
 - **Web headless (Playwright):** this repo has no Playwright dependency; run it
   from an env that does. Serve the site, then drive it. **The CSP (`script-src
