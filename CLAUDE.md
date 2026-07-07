@@ -94,6 +94,12 @@ Exit status is `0` only when all 13 records are present and correct.
   refactors. Capture `glamrocnamecheap.com` (expect 13/13, exit 0) and
   `example.com --provider namecheap|squarespace|cosmotown|generic` before a change, then
   `diff` after. Also test invalid/malicious domains → rejected with exit 2.
+- **Fix layout:** `--provider` fixes default to a compact per-type table (one
+  column per provider field, one row per failing record); `--fix-format long`
+  gives the older one-labelled-block-per-record layout. The web app mirrors this
+  with the "Fix format" selector (Table/Detailed). Both are driven off the same
+  `providers.<name>.<TYPE>.fields` in `records.json` — keep the two renderers in
+  sync. When capturing a CLI baseline, pin `--fix-format` so the diff is stable.
 - **Web headless (Playwright):** this repo has no Playwright dependency; run it
   from an env that does. Serve the site, then drive it. **The CSP (`script-src
   'self'`, no `unsafe-eval`) blocks Playwright's `page.wait_for_function`** — poll

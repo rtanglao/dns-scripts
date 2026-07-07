@@ -61,6 +61,13 @@
     }
     .fix h3 { margin: 0 0 .35rem; font-size: .95rem; }
     .fix pre { margin: 0; white-space: pre-wrap; font: .85rem/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .fixhdr { margin: 0 0 .5rem; font-size: .85rem; }
+    .fixtable { border-collapse: collapse; width: 100%;
+      font: .82rem/1.4 ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .fixtable th, .fixtable td {
+      text-align: left; padding: .25rem .5rem; border-bottom: 1px solid var(--border);
+      vertical-align: top; word-break: break-all; }
+    .fixtable th { color: var(--muted); font-weight: 600; white-space: nowrap; }
     .note { color: var(--muted); font-size: .85rem; margin-top: 1.5rem; }
     code { background: var(--card); padding: .05rem .3rem; border-radius: 4px; }
     a { color: var(--accent); }
@@ -90,6 +97,13 @@
         <select id="resolver">
           <option value="cloudflare">Cloudflare (1.1.1.1)</option>
           <option value="google">Google (8.8.8.8)</option>
+        </select>
+      </div>
+      <div>
+        <label for="fixformat">Fix format</label>
+        <select id="fixformat">
+          <option value="table">Table</option>
+          <option value="long">Detailed</option>
         </select>
       </div>
       <button id="check" type="submit">Check</button>

@@ -14,9 +14,11 @@ Usage:
 
 Exit status is 0 only if every expected record is present and correct.
 
-Pass --provider to print, for each FAILING record, exactly what to enter in that
-DNS provider's control panel (accounting for provider quirks such as how the
+Pass --provider to print exactly what to enter in that DNS provider's control
+panel for each FAILING record (accounting for provider quirks such as how the
 Host/Name field is written). The supported providers come from records.json.
+Fixes print as a compact per-type table by default; --fix-format long gives the
+older one-labelled-block-per-record layout.
 
 The record set, value templates, and per-provider remediation strings all live in
 records.json, which is shared verbatim with the browser version (index.html /
@@ -104,13 +106,28 @@ def value_of(ctx: dict, cfg: dict, key: str) -> str:
 
 
 def render_fix(cfg: dict, provider: str, ctx: dict) -> list[str]:
-    """Provider-specific instructions for entering a record (header + fields)."""
+    """Long form: provider instructions for one record (header + labelled fields)."""
     block = cfg["providers"][provider][ctx["type"]]
     width = max(len(lbl) for lbl, _ in block["fields"]) + 1  # + 1 for the colon
     lines = [block["header"]]
     for lbl, tpl in block["fields"]:
         lines.append(f"    {(lbl + ':'):<{width}} {interpolate(tpl, ctx)}")
     return lines
+
+
+def render_fix_table(cfg: dict, provider: str, rtype: str, ctxs: list[dict]) -> list[str]:
+    """Compact form: provider header, then one column per field and one row per
+    failing record of the same type."""
+    block = cfg["providers"][provider][rtype]
+    labels = [lbl for lbl, _ in block["fields"]]
+    rows = [[interpolate(tpl, ctx) for _, tpl in block["fields"]] for ctx in ctxs]
+    widths = [max(len(labels[i]), *(len(r[i]) for r in rows)) for i in range(len(labels))]
+
+    def fmt(cells: list[str]) -> str:  # left-align every column but the last
+        return "  ".join(c if i == len(cells) - 1 else c.ljust(widths[i])
+                         for i, c in enumerate(cells))
+
+    return [block["header"], "", "  " + fmt(labels), *("  " + fmt(r) for r in rows)]
 
 
 def build_resolver(server: str) -> dns.resolver.Resolver:
@@ -154,6 +171,13 @@ def main() -> int:
         default=os.environ.get("DNS_RESOLVER", "1.1.1.1"),
         help="resolver IP or hostname to query (default: $DNS_RESOLVER or 1.1.1.1)",
     )
+    parser.add_argument(
+        "--fix-format",
+        choices=("table", "long"),
+        default="table",
+        help="layout for --provider fixes: compact 'table' (default) or 'long' "
+        "(one labelled block per record)",
+    )
     args = parser.parse_args()
 
     domain = args.domain.strip().rstrip(".")
@@ -193,10 +217,19 @@ def main() -> int:
 
     if failures and args.provider:
         print(f"\n{BOLD}How to fix {len(failures)} record(s) in {args.provider}:{RESET}")
-        for ctx in failures:
-            print(f"\n• {ctx['type']} {ctx.get('label', ctx['host'])}")
-            for line in render_fix(cfg, args.provider, ctx):
-                print(f"  {line}")
+        if args.fix_format == "long":
+            for ctx in failures:
+                print(f"\n• {ctx['type']} {ctx.get('label', ctx['host'])}")
+                for line in render_fix(cfg, args.provider, ctx):
+                    print(f"  {line}")
+        else:
+            groups: dict[str, list[dict]] = {}  # group failures by type, in order
+            for ctx in failures:
+                groups.setdefault(ctx["type"], []).append(ctx)
+            for rtype, ctxs in groups.items():
+                print()
+                for line in render_fix_table(cfg, args.provider, rtype, ctxs):
+                    print(line)
     elif failures:
         choices = ", ".join(providers)
         print(f"\nRe-run with --provider ({choices}) to see exactly what to enter.")

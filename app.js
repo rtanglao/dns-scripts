@@ -58,6 +58,7 @@ function valueOf(ctx, cfg, key) {
 }
 
 function renderFix(cfg, provider, ctx) {
+  // Long form: header + labelled fields for a single record.
   const block = cfg.providers[provider][ctx.type];
   const width = Math.max(...block.fields.map(([lbl]) => lbl.length)) + 1;
   const lines = [block.header];
@@ -65,6 +66,28 @@ function renderFix(cfg, provider, ctx) {
     lines.push(`    ${(lbl + ":").padEnd(width)} ${interpolate(tpl, ctx)}`);
   }
   return lines;
+}
+
+// Compact form: provider header, then a table with one column per field and one
+// row per failing record of the same type. Built from DOM nodes (textContent
+// only) so it stays within the CSP — no innerHTML.
+function fixTable(cfg, provider, rtype, ctxs) {
+  const block = cfg.providers[provider][rtype];
+  const wrap = el("div", "fix");
+  wrap.appendChild(el("p", "fixhdr", block.header));
+  const table = el("table", "fixtable");
+  const htr = el("tr");
+  for (const [lbl] of block.fields) htr.appendChild(el("th", null, lbl));
+  table.appendChild(el("thead", null)).appendChild(htr);
+  const tbody = el("tbody");
+  for (const ctx of ctxs) {
+    const tr = el("tr");
+    for (const [, tpl] of block.fields) tr.appendChild(el("td", null, interpolate(tpl, ctx)));
+    tbody.appendChild(tr);
+  }
+  table.appendChild(tbody);
+  wrap.appendChild(table);
+  return wrap;
 }
 
 // --- DNS query (the one genuinely platform-specific piece: DoH here) ----------
@@ -170,11 +193,22 @@ async function runCheck(evt) {
     if (failures.length && provider) {
       $("fixes").appendChild(
         el("h2", null, `How to fix ${failures.length} record(s) in ${provider}:`));
-      for (const ctx of failures) {
-        const card = el("div", "fix");
-        card.appendChild(el("h3", null, `${ctx.type} ${ctx.label ?? ctx.host}`));
-        card.appendChild(el("pre", null, renderFix(CFG, provider, ctx).join("\n")));
-        $("fixes").appendChild(card);
+      if ($("fixformat").value === "long") {
+        for (const ctx of failures) {
+          const card = el("div", "fix");
+          card.appendChild(el("h3", null, `${ctx.type} ${ctx.label ?? ctx.host}`));
+          card.appendChild(el("pre", null, renderFix(CFG, provider, ctx).join("\n")));
+          $("fixes").appendChild(card);
+        }
+      } else {
+        const groups = new Map(); // group failures by record type, in order
+        for (const ctx of failures) {
+          if (!groups.has(ctx.type)) groups.set(ctx.type, []);
+          groups.get(ctx.type).push(ctx);
+        }
+        for (const [rtype, ctxs] of groups) {
+          $("fixes").appendChild(fixTable(CFG, provider, rtype, ctxs));
+        }
       }
     } else if (failures.length) {
       $("fixes").appendChild(el("p", "note",
