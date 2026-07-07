@@ -69,9 +69,9 @@ uv run verify_thundermail_dns.py <domain> --resolver ndns1.cosmotown.com
 Pass `--provider` to print, for each **failing** record, exactly what to enter in
 that DNS provider's control panel — including provider-specific quirks such as how
 the Host/Name field is written. Supported: `namecheap`, `squarespace`, `cosmotown`,
-`generic`. The `cosmotown` strings are **untested** against a live panel (they carry
-an `[UNTESTED]` marker in the output) and note that Cosmotown's customer panel can't
-self-serve SRV records — those must be added by Cosmotown support.
+`generic`. Note that Cosmotown's customer panel has no SRV section, so the five SRV
+records can't be self-served — the `cosmotown` output routes you to Cosmotown support
+for those.
 
 ```sh
 uv run verify_thundermail_dns.py glamrocnamecheap.com --provider namecheap

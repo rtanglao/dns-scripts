@@ -49,12 +49,14 @@ The checked set is 13 records: 1 MX, 5 SRV (jmap/caldavs/carddavs/imaps/submissi
   guessed** (e.g. Namecheap splits SRV into Host/Priority/Weight/Port/Target;
   Squarespace uses Name + a separate Priority + `Data` = "weight port target").
   Provider menu wording may drift — re-verify if a user reports it's off.
-  **Exception: `cosmotown` is derived from Cosmotown's help docs but NOT yet
-  confirmed against a live panel** — its headers carry an `[UNTESTED]` marker.
-  Notable doc-sourced quirks baked in: MX Host is left blank (no `@`) and targets
-  take no trailing period; TXT values are case-sensitive; and **SRV records can't be
-  added via the customer panel at all** — that block routes the user to Cosmotown
-  support instead. Drop the `[UNTESTED]` marker once someone verifies it live.
+  `cosmotown` was verified against a live panel (dexterica.com). Its quirks:
+  records are grouped into per-type sections each with its own `+ Quick Add`
+  (so there's no Type field); columns are `Priority`/`Host`/`Points to` (MX),
+  `Host`/`Points to` (CNAME), `Host`/`TXT Value` (TXT); MX Host is left blank for
+  the root and the panel auto-fills the domain; the CNAME `Points to` is stored
+  with a trailing dot automatically; TXT values are wrapped in quotes by the panel
+  and are case-sensitive; and **there is no SRV section at all** — the SRV block
+  routes the user to Cosmotown support instead.
 
 ## Security posture
 
