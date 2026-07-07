@@ -92,6 +92,9 @@ def resolve_record(rec: dict, domain: str) -> dict:
     ctx["domain"] = domain
     ctx["qname"] = domain if host == "@" else f"{host}.{domain}"
     ctx["fqdn"] = (domain + ".") if host == "@" else f"{host}.{domain}."
+    # Relative host label, empty at the apex — for panels (e.g. Cosmotown) whose
+    # Host field is left blank for the root domain rather than written as "@".
+    ctx["subhost"] = "" if host == "@" else host
     return ctx
 
 

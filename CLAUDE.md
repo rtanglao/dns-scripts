@@ -28,7 +28,9 @@ The checked set is 13 records: 1 MX, 5 SRV (jmap/caldavs/carddavs/imaps/submissi
   records/strings in the Python or JS.
 - **Each front-end keeps only a tiny interpreter** (~20 lines): an `interpolate`
   (`{field}` token substitution), a `resolve_record`/`resolveRecord` (fills
-  `{domain}`, computes `qname`/`fqdn`), and one platform-specific DNS-query
+  `{domain}`, computes `qname`/`fqdn`, and `subhost` = the host label but empty at
+  the apex, for panels like Cosmotown whose Host field is left blank — not `@` —
+  for the root domain), and one platform-specific DNS-query
   function — dnspython (CLI) vs a DoH `fetch` (web). These are intentionally
   duplicated in Python and JS; keep them in sync. The **hostname-validation regex**
   is likewise duplicated in both — keep it identical.

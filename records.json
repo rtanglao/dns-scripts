@@ -61,20 +61,20 @@
     },
     "cosmotown": {
       "MX": {
-        "header": "Cosmotown → Domains → your domain → DNS records → 'MX(Mail Exchange Record)' section → + Quick Add. Leave Host blank for the root domain (it auto-fills to your domain); enter Points to with no trailing period:",
-        "fields": [["Priority", "{priority}"], ["Host", "(leave blank)"], ["Points to", "{target}"]]
+        "header": "Cosmotown → Domains → your domain → DNS records → 'MX(Mail Exchange Record)' section → + Quick Add. Leave the Host field blank for the root domain — Cosmotown auto-fills your domain (do NOT type @; the blank Host below is intentional); enter Points to with no trailing period:",
+        "fields": [["Priority", "{priority}"], ["Host", "{subhost}"], ["Points to", "{target}"]]
       },
       "SRV": {
         "header": "Cosmotown's customer panel has no SRV section — contact Cosmotown support (the 'Support' link, top-right) and ask them to add this SRV record for you:",
         "fields": [["Host", "{host}"], ["Priority", "{priority}"], ["Weight", "{weight}"], ["Port", "{port}"], ["Target", "{target}"]]
       },
       "TXT": {
-        "header": "Cosmotown → Domains → your domain → DNS records → 'TXT(TXT Record)' section → + Quick Add. Leave Host blank for the root domain; enter the value WITHOUT surrounding quotes (the panel adds them) and preserve its exact upper/lowercase:",
-        "fields": [["Host", "{host}"], ["TXT Value", "{value}"]]
+        "header": "Cosmotown → Domains → your domain → DNS records → 'TXT(TXT Record)' section → + Quick Add. Leave the Host field blank for the root domain (do NOT type @; the blank Host below is intentional); enter the value WITHOUT surrounding quotes (the panel adds them) and preserve its exact upper/lowercase:",
+        "fields": [["Host", "{subhost}"], ["TXT Value", "{value}"]]
       },
       "CNAME": {
         "header": "Cosmotown → Domains → your domain → DNS records → 'CNAME(CNAME Record)' section → + Quick Add (the panel stores the target with a trailing dot automatically):",
-        "fields": [["Host", "{host}"], ["Points to", "{target}"]]
+        "fields": [["Host", "{subhost}"], ["Points to", "{target}"]]
       }
     },
     "generic": {

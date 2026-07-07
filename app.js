@@ -46,6 +46,9 @@ function resolveRecord(rec, domain) {
   ctx.domain = domain;
   ctx.qname = host === "@" ? domain : `${host}.${domain}`;
   ctx.fqdn = host === "@" ? `${domain}.` : `${host}.${domain}.`;
+  // Relative host label, empty at the apex — for panels (e.g. Cosmotown) whose
+  // Host field is left blank for the root domain rather than written as "@".
+  ctx.subhost = host === "@" ? "" : host;
   return ctx;
 }
 
