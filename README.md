@@ -58,7 +58,8 @@ uv run verify_thundermail_dns.py glamrocnamecheap.com --resolver dns1.registrar-
 Point it at whichever nameserver is actually authoritative for the domain — check
 with `dig NS <domain>` first, since a registrar may run several nameserver sets and
 querying the wrong one just returns empty answers. For example, a domain hosted on
-Cosmotown's DNS is usually delegated to `ndns1.cosmotown.com` / `ndns2.cosmotown.com`:
+Cosmotown's DNS is usually delegated to `ndns1.cosmotown.com` / `ndns2.cosmotown.com`
+([Cosmotown: What are Cosmotown's nameservers?](https://cosmotown.zendesk.com/hc/en-us/articles/214830046-How-to-change-your-Nameservers-What-are-Cosmotown-s-Nameservers)):
 
 ```sh
 uv run verify_thundermail_dns.py <domain> --resolver ndns1.cosmotown.com
@@ -71,7 +72,10 @@ that DNS provider's control panel — including provider-specific quirks such as
 the Host/Name field is written. Supported: `namecheap`, `squarespace`, `cosmotown`,
 `generic`. Note that Cosmotown's customer panel has no SRV section, so the five SRV
 records can't be self-served — the `cosmotown` output routes you to Cosmotown support
-for those.
+for those. See Cosmotown's docs for
+[changing/saving DNS records](https://cosmotown.zendesk.com/hc/en-us/articles/214829926-How-to-change-and-save-your-DNS-Records),
+[adding a host name](https://cosmotown.zendesk.com/hc/en-us/articles/214830006-How-to-add-a-Host-Name-to-your-Domain-name-s-DNS),
+and [updating the MX record](https://cosmotown.zendesk.com/hc/en-us/articles/214830106-How-to-update-the-MX-Record).
 
 ```sh
 uv run verify_thundermail_dns.py glamrocnamecheap.com --provider namecheap

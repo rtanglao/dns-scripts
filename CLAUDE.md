@@ -46,7 +46,8 @@ The checked set is 13 records: 1 MX, 5 SRV (jmap/caldavs/carddavs/imaps/submissi
   Cosmotown, for example, runs two nameserver families: `ns1..ns4.cosmotown.com`
   (Cloudflare-fronted) and `ndns1`/`ndns2.cosmotown.com` (AWS). A domain lives on
   only one; querying the wrong one returns `REFUSED` (shows up as `<empty>` for
-  every record). Cosmotown example: `--resolver ndns1.cosmotown.com`.
+  every record). Cosmotown example: `--resolver ndns1.cosmotown.com`
+  ([Cosmotown: nameservers](https://cosmotown.zendesk.com/hc/en-us/articles/214830046-How-to-change-your-Nameservers-What-are-Cosmotown-s-Nameservers)).
 - **Provider field conventions were verified against each provider's docs, not
   guessed** (e.g. Namecheap splits SRV into Host/Priority/Weight/Port/Target;
   Squarespace uses Name + a separate Priority + `Data` = "weight port target").
@@ -58,7 +59,11 @@ The checked set is 13 records: 1 MX, 5 SRV (jmap/caldavs/carddavs/imaps/submissi
   the root and the panel auto-fills the domain; the CNAME `Points to` is stored
   with a trailing dot automatically; TXT values are wrapped in quotes by the panel
   and are case-sensitive; and **there is no SRV section at all** — the SRV block
-  routes the user to Cosmotown support instead.
+  routes the user to Cosmotown support instead. Docs:
+  [changing/saving DNS records](https://cosmotown.zendesk.com/hc/en-us/articles/214829926-How-to-change-and-save-your-DNS-Records),
+  [adding a host name](https://cosmotown.zendesk.com/hc/en-us/articles/214830006-How-to-add-a-Host-Name-to-your-Domain-name-s-DNS),
+  [updating the MX record](https://cosmotown.zendesk.com/hc/en-us/articles/214830106-How-to-update-the-MX-Record)
+  (Zendesk is behind Cloudflare, so these need a real browser — automated fetches 403).
 
 ## Security posture
 
