@@ -6,6 +6,25 @@ provider is pure data in [`records.json`](records.json); both front-ends (the
 automatically. See [`CONTRIBUTING.md`](CONTRIBUTING.md) for the onboarding workflow
 and the verification bar every provider is held to.
 
+## ⚠️ Pending verification
+
+**`spaceship` is unverified.** To promote it (do this when you have a live Spaceship
+panel open):
+
+1. Open the panel and click **+ Add record** for one record of each type
+   (MX / SRV / TXT / CNAME) — the *manual* form, not the zone-import preview.
+2. Confirm three things:
+   - The exact field labels in the add form (is it `Host` or `Hostname`? etc.).
+   - **SRV host** — does the form want it as one field (`_caldavs._tcp`, what we
+     ship) or split into service + protocol (`_caldavs` + `_tcp`, as the import
+     preview showed)?
+   - Whether CNAME/MX targets need a trailing dot (the import preview stored one).
+3. Fix `records.json` if anything differs, then remove the `UNVERIFIED —` prefixes
+   from the four `spaceship` headers, and delete the unverified notes in
+   [`README.md`](README.md) and the `spaceship` section below.
+
+Details and reasoning are in the [`spaceship` notes](#spaceship-spaceshipcom--unverified).
+
 ## Providers
 
 | Provider      | Added      | Verification                                                                 |
