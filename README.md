@@ -78,10 +78,14 @@ uv run verify_thundermail_dns.py <domain> --resolver kiki.bunny.net
 Pass `--provider` to print, for each **failing** record, exactly what to enter in
 that DNS provider's control panel — including provider-specific quirks such as how
 the Host/Name field is written. Supported: `namecheap`, `squarespace`, `cosmotown`,
-`bunny`, `generic`. bunny.net's add-record form has a single **Value** field (no
-separate Priority/Weight/Port), so the `bunny` MX/SRV output puts the whole record
-string in Value; the Hostname field is left empty for the root
-([bunny.net: DNS records](https://docs.bunny.net/docs/dns-records)). Note that
+`bunny`, `spaceship`, `generic`. bunny.net's add-record form has a single **Value**
+field (no separate Priority/Weight/Port), so the `bunny` MX/SRV output puts the
+whole record string in Value; the Hostname field is left empty for the root
+([bunny.net: DNS records](https://docs.bunny.net/docs/dns-records)). **`spaceship`
+is unverified** — its field conventions were inferred from a zone-import screenshot
+and Spaceship's own Spacemail docs (a different record set), not confirmed against
+the live manual add-record form, so its headers flag this and the SRV host handling
+is uncertain (see [`RELEASE_NOTES.md`](RELEASE_NOTES.md)). Note that
 Cosmotown's customer panel has no SRV section, so the five SRV
 records can't be self-served — the `cosmotown` output routes you to Cosmotown support
 for those. See Cosmotown's docs for

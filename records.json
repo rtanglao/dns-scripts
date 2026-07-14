@@ -95,6 +95,24 @@
         "fields": [["Hostname", "{host}"], ["Type", "CNAME"], ["Value", "{target}"]]
       }
     },
+    "spaceship": {
+      "MX": {
+        "header": "UNVERIFIED — confirm the field names against your panel. Spaceship → your domain → Advanced DNS → DNS records → + Add record → MX. Host is @ for the root domain (Spaceship auto-appends your domain):",
+        "fields": [["Host", "{host}"], ["Type", "MX"], ["Value", "{target}"], ["Priority", "{priority}"]]
+      },
+      "SRV": {
+        "header": "UNVERIFIED — confirm the field names against your panel. Spaceship → your domain → Advanced DNS → DNS records → + Add record → SRV:",
+        "fields": [["Host", "{host}"], ["Type", "SRV"], ["Priority", "{priority}"], ["Weight", "{weight}"], ["Port", "{port}"], ["Target", "{target}"]]
+      },
+      "TXT": {
+        "header": "UNVERIFIED — confirm the field names against your panel. Spaceship → your domain → Advanced DNS → DNS records → + Add record → TXT. Host is @ for the root domain:",
+        "fields": [["Host", "{host}"], ["Type", "TXT"], ["Value", "{value}"]]
+      },
+      "CNAME": {
+        "header": "UNVERIFIED — confirm the field names against your panel. Spaceship → your domain → Advanced DNS → DNS records → + Add record → CNAME:",
+        "fields": [["Host", "{host}"], ["Type", "CNAME"], ["Value", "{target}"]]
+      }
+    },
     "generic": {
       "MX": {
         "header": "Add this DNS record:",

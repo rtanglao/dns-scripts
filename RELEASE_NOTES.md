@@ -15,6 +15,7 @@ and the verification bar every provider is held to.
 | `generic`     | 2026-07-02 | Provider-agnostic FQDN/value fallback — nothing panel-specific to verify.    |
 | `cosmotown`   | 2026-07-07 | Verified against a live panel (dexterica.com); quirks confirmed from a record-list screenshot. |
 | `bunny`       | 2026-07-13 | Verified against bunny.net's official docs (docs.bunny.net/docs/dns-records). |
+| `spaceship`   | 2026-07-13 | **Unverified.** Inferred from a zone-import screenshot + Spaceship's Spacemail docs. |
 
 ## Notes
 
@@ -47,3 +48,40 @@ Driven by Zendesk ticket [6750](https://tbpro.zendesk.com/agent/tickets/6750).
 Every value bunny.net serves matches the expected strings byte-for-byte, including
 `MX 10 mail.thundermail.com` and `SRV 0 1 443 mail.thundermail.com` — confirming the
 single-`Value`-field (`{match}`) remediation produces exactly what the panel stores.
+
+### `spaceship` (spaceship.com) — unverified
+
+Added 2026-07-13 for Zendesk ticket
+[6672](https://tbpro.zendesk.com/agent/tickets/6672). Marked **unverified** because
+the two sources only partly cover it:
+
+- A **zone-import preview** screenshot from the real `dexterica.com` zone
+  (CONTRIBUTING artifact type 2, and specifically the *import* view — not the
+  higher-priority manual add-record form, type 1).
+- Spaceship's official docs
+  ([Required DNS records for Spacemail](https://www.spaceship.com/knowledgebase/spacemail-dns-records-third-party-domain/)),
+  which document **Spacemail's own** records (`mx1.spacemail.com`, …), a *different*
+  record set — so they confirm the panel's column labels but not the Thundermail
+  entries.
+
+What the sources agree on and we encoded:
+
+- Columns are **Host / Type / Value / TTL** (docs call Host "Hostname"); the panel
+  auto-appends the domain to Host and uses **`@` for the root** (not blank).
+- **MX** has a separate **Priority** field alongside the target Value.
+- **SRV** breaks out **Priority / Weight / Port / Target** as separate fields.
+- The provider headers themselves carry an `UNVERIFIED` prefix so CLI/web users see
+  the caveat inline.
+
+Still **unverified** against a live manual add-record form:
+
+- Exact field labels in the *add* form (vs. the import preview).
+- **SRV host**: the import view split it into `_caldavs` + `_tcp` (service +
+  protocol) fields; we encoded the combined `_caldavs._tcp` (matching the docs'
+  single `_autodiscover._tcp` hostname). Confirm which the add form expects.
+- Whether CNAME/MX targets need a trailing dot (the import view showed them stored
+  with one).
+
+To promote to verified: capture the manual add-record form for one record of each
+type, confirm the field sets, then drop the `UNVERIFIED` prefixes in `records.json`
+and the note here and in [`README.md`](README.md).
