@@ -43,6 +43,7 @@ dropped the unverified CNAME "no trailing dot" note.
 
 **Live validation (2026-07-13):** ran the CLI against the real bunny.net-hosted
 `soylent.red` (delegated to `kiki`/`coco.bunny.net`) → **13/13 passed, exit 0**.
+Driven by Zendesk ticket [6750](https://tbpro.zendesk.com/agent/tickets/6750).
 Every value bunny.net serves matches the expected strings byte-for-byte, including
 `MX 10 mail.thundermail.com` and `SRV 0 1 443 mail.thundermail.com` — confirming the
 single-`Value`-field (`{match}`) remediation produces exactly what the panel stores.
