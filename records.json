@@ -77,6 +77,24 @@
         "fields": [["Host", "{subhost}"], ["Points to", "{target}"]]
       }
     },
+    "bunny": {
+      "MX": {
+        "header": "bunny.net → DNS → your zone → DNS records → Add Record → Type: MX. Leave Name blank for the root domain — bunny displays it as your domain in the list (do NOT type @):",
+        "fields": [["Type", "MX"], ["Name", "{subhost}"], ["Value", "{target}"], ["Priority", "{priority}"]]
+      },
+      "SRV": {
+        "header": "bunny.net → DNS → your zone → DNS records → Add Record → Type: SRV:",
+        "fields": [["Type", "SRV"], ["Name", "{host}"], ["Priority", "{priority}"], ["Weight", "{weight}"], ["Port", "{port}"], ["Value", "{target}"]]
+      },
+      "TXT": {
+        "header": "bunny.net → DNS → your zone → DNS records → Add Record → Type: TXT. Leave Name blank for the root domain (do NOT type @):",
+        "fields": [["Type", "TXT"], ["Name", "{subhost}"], ["Value", "{value}"]]
+      },
+      "CNAME": {
+        "header": "bunny.net → DNS → your zone → DNS records → Add Record → Type: CNAME:",
+        "fields": [["Type", "CNAME"], ["Name", "{host}"], ["Value", "{target}   (no trailing dot)"]]
+      }
+    },
     "generic": {
       "MX": {
         "header": "Add this DNS record:",
