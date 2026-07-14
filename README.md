@@ -66,6 +66,13 @@ Cosmotown's DNS is usually delegated to `ndns1.cosmotown.com` / `ndns2.cosmotown
 uv run verify_thundermail_dns.py <domain> --resolver ndns1.cosmotown.com
 ```
 
+A domain hosted on Bunny DNS is delegated to `kiki.bunny.net` / `coco.bunny.net`
+([bunny.net: DNS records](https://docs.bunny.net/docs/dns-records)):
+
+```sh
+uv run verify_thundermail_dns.py <domain> --resolver kiki.bunny.net
+```
+
 ### Fixing failures
 
 Pass `--provider` to print, for each **failing** record, exactly what to enter in

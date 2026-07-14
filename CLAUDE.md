@@ -48,6 +48,9 @@ The checked set is 13 records: 1 MX, 5 SRV (jmap/caldavs/carddavs/imaps/submissi
   only one; querying the wrong one returns `REFUSED` (shows up as `<empty>` for
   every record). Cosmotown example: `--resolver ndns1.cosmotown.com`
   ([Cosmotown: nameservers](https://cosmotown.zendesk.com/hc/en-us/articles/214830046-How-to-change-your-Nameservers-What-are-Cosmotown-s-Nameservers)).
+  Bunny DNS delegates to `kiki.bunny.net` / `coco.bunny.net`, so
+  `--resolver kiki.bunny.net` queries it authoritatively (verified against the live
+  `soylent.red` zone — 13/13).
 - **Provider field conventions were verified against each provider's docs, not
   guessed** (e.g. Namecheap splits SRV into Host/Priority/Weight/Port/Target;
   Squarespace uses Name + a separate Priority + `Data` = "weight port target").
