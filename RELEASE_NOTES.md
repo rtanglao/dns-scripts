@@ -40,3 +40,9 @@ conventions:
 Corrections made from the initial screenshot-only draft: the field is **Hostname**
 (not "Name"); MX/SRV use a single **Value** (not separate Priority/Weight/Port);
 dropped the unverified CNAME "no trailing dot" note.
+
+**Live validation (2026-07-13):** ran the CLI against the real bunny.net-hosted
+`soylent.red` (delegated to `kiki`/`coco.bunny.net`) → **13/13 passed, exit 0**.
+Every value bunny.net serves matches the expected strings byte-for-byte, including
+`MX 10 mail.thundermail.com` and `SRV 0 1 443 mail.thundermail.com` — confirming the
+single-`Value`-field (`{match}`) remediation produces exactly what the panel stores.
