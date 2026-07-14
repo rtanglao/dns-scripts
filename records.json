@@ -79,20 +79,20 @@
     },
     "bunny": {
       "MX": {
-        "header": "bunny.net → DNS → your zone → DNS records → Add Record → Type: MX. Leave Name blank for the root domain — bunny displays it as your domain in the list (do NOT type @):",
-        "fields": [["Type", "MX"], ["Name", "{subhost}"], ["Value", "{target}"], ["Priority", "{priority}"]]
+        "header": "bunny.net → DNS → select your DNS Zone → Add Record. Leave Hostname empty for the root domain (bunny lists it as your domain; do NOT type @). Bunny has one Value field with no separate Priority field — enter the priority and mail host together:",
+        "fields": [["Hostname", "{subhost}"], ["Type", "MX"], ["Value", "{match}"]]
       },
       "SRV": {
-        "header": "bunny.net → DNS → your zone → DNS records → Add Record → Type: SRV:",
-        "fields": [["Type", "SRV"], ["Name", "{host}"], ["Priority", "{priority}"], ["Weight", "{weight}"], ["Port", "{port}"], ["Value", "{target}"]]
+        "header": "bunny.net → DNS → select your DNS Zone → Add Record. Bunny has one Value field with no separate Priority/Weight/Port fields — enter the whole SRV value (priority weight port target):",
+        "fields": [["Hostname", "{host}"], ["Type", "SRV"], ["Value", "{match}"]]
       },
       "TXT": {
-        "header": "bunny.net → DNS → your zone → DNS records → Add Record → Type: TXT. Leave Name blank for the root domain (do NOT type @):",
-        "fields": [["Type", "TXT"], ["Name", "{subhost}"], ["Value", "{value}"]]
+        "header": "bunny.net → DNS → select your DNS Zone → Add Record. Leave Hostname empty for the root domain (do NOT type @):",
+        "fields": [["Hostname", "{subhost}"], ["Type", "TXT"], ["Value", "{value}"]]
       },
       "CNAME": {
-        "header": "bunny.net → DNS → your zone → DNS records → Add Record → Type: CNAME:",
-        "fields": [["Type", "CNAME"], ["Name", "{host}"], ["Value", "{target}   (no trailing dot)"]]
+        "header": "bunny.net → DNS → select your DNS Zone → Add Record:",
+        "fields": [["Hostname", "{host}"], ["Type", "CNAME"], ["Value", "{target}"]]
       }
     },
     "generic": {

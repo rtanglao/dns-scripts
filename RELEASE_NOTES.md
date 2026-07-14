@@ -14,29 +14,29 @@ and the verification bar every provider is held to.
 | `squarespace` | 2026-07-02 | Field conventions verified against Squarespace's docs.                       |
 | `generic`     | 2026-07-02 | Provider-agnostic FQDN/value fallback — nothing panel-specific to verify.    |
 | `cosmotown`   | 2026-07-07 | Verified against a live panel (dexterica.com); quirks confirmed from a record-list screenshot. |
-| `bunny`       | 2026-07-13 | **Untested.** Inferred from a record-list screenshot (soylent.red) only.     |
+| `bunny`       | 2026-07-13 | Verified against bunny.net's official docs (docs.bunny.net/docs/dns-records). |
 
 ## Notes
 
-### `bunny` (bunny.net) — untested
+### `bunny` (bunny.net)
 
-Added 2026-07-13 from a bunny.net DNS **record-list** screenshot (the `soylent.red`
-zone) — CONTRIBUTING artifact type 2, not the higher-priority "add / edit record
-form" (type 1). What the list confirmed:
+Added 2026-07-13. First drafted from a record-list screenshot (the `soylent.red`
+zone), then **corrected and verified** the same day against bunny.net's official
+docs ([DNS records](https://docs.bunny.net/docs/dns-records)). The confirmed
+conventions:
 
-- Columns are **TYPE / NAME / VALUE / WEIGHT / TTL**.
-- Subdomain records show just the label in NAME (`mta-sts`, `tm1._domainkey`,
-  `_dmarc`, …); true apex records (MX and SPF TXT) display the **full domain**,
-  which we read as the Name field being left **blank** at the root (the `subhost`
-  pattern, like Cosmotown) rather than `@`.
+- The add-record dialog is a **single form** with a **Type** dropdown (not per-type
+  sections like Cosmotown) and fields **Hostname / Type / TTL / Value**.
+- **Hostname** is left **empty for the root domain** (the `subhost` pattern) — never
+  `@`; bunny lists apex records under the full domain name.
+- There is **one Value field with no separate Priority / Weight / Port fields**, so
+  MX and SRV put the whole record string in Value (`{match}`) — e.g. MX
+  `10 mail.thundermail.com`, SRV `0 1 443 mail.thundermail.com`. The record-list
+  screenshot corroborated this (MX displayed as `10 mail.thundermail.com`).
+- The record list's **Weight** column is bunny's A/AAAA load-balancing "Routing
+  Weight" (0-100, under Advanced Settings), **not** the SRV weight — so it does not
+  factor into any of the Thundermail records.
 
-Still **unverified** against a live add-record form:
-
-- The SRV field labels and order (we assumed Priority / Weight / Port / Value).
-- Whether the CNAME `Value` should carry a trailing dot (we noted "no trailing dot").
-- Whether the add-record dialog has a single Type dropdown (assumed) vs. per-type
-  sections like Cosmotown.
-
-To promote `bunny` to verified: capture the add / edit record form with the record
--type dropdown expanded, confirm the four field sets, then drop the "untested" note
-here and in [`README.md`](README.md).
+Corrections made from the initial screenshot-only draft: the field is **Hostname**
+(not "Name"); MX/SRV use a single **Value** (not separate Priority/Weight/Port);
+dropped the unverified CNAME "no trailing dot" note.

@@ -64,6 +64,14 @@ The checked set is 13 records: 1 MX, 5 SRV (jmap/caldavs/carddavs/imaps/submissi
   [adding a host name](https://cosmotown.zendesk.com/hc/en-us/articles/214830006-How-to-add-a-Host-Name-to-your-Domain-name-s-DNS),
   [updating the MX record](https://cosmotown.zendesk.com/hc/en-us/articles/214830106-How-to-update-the-MX-Record)
   (Zendesk is behind Cloudflare, so these need a real browser — automated fetches 403).
+  `bunny` was verified against bunny.net's
+  [DNS records docs](https://docs.bunny.net/docs/dns-records). Its add-record dialog
+  is a single form (`Hostname`/`Type`/`TTL`/`Value`, Type chosen from a dropdown):
+  `Hostname` is left **empty** for the root (never `@`), and there is **one `Value`
+  field with no separate Priority/Weight/Port**, so MX and SRV put the whole record
+  string in `Value` (the `{match}` template — e.g. `10 mail.thundermail.com`). The
+  record list's `Weight` column is bunny's A/AAAA load-balancing "Routing Weight",
+  not the SRV weight, so it's irrelevant here.
 
 ## Security posture
 

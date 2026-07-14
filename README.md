@@ -71,10 +71,11 @@ uv run verify_thundermail_dns.py <domain> --resolver ndns1.cosmotown.com
 Pass `--provider` to print, for each **failing** record, exactly what to enter in
 that DNS provider's control panel — including provider-specific quirks such as how
 the Host/Name field is written. Supported: `namecheap`, `squarespace`, `cosmotown`,
-`bunny`, `generic`. **`bunny` is untested** — its field conventions were inferred
-from a record-list screenshot, not confirmed against the live add-record form, so
-the SRV field labels/order and CNAME trailing-dot handling are unverified (see
-[`RELEASE_NOTES.md`](RELEASE_NOTES.md)). Note that Cosmotown's customer panel has no SRV section, so the five SRV
+`bunny`, `generic`. bunny.net's add-record form has a single **Value** field (no
+separate Priority/Weight/Port), so the `bunny` MX/SRV output puts the whole record
+string in Value; the Hostname field is left empty for the root
+([bunny.net: DNS records](https://docs.bunny.net/docs/dns-records)). Note that
+Cosmotown's customer panel has no SRV section, so the five SRV
 records can't be self-served — the `cosmotown` output routes you to Cosmotown support
 for those. See Cosmotown's docs for
 [changing/saving DNS records](https://cosmotown.zendesk.com/hc/en-us/articles/214829926-How-to-change-and-save-your-DNS-Records),
