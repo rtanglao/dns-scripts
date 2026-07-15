@@ -25,6 +25,23 @@ panel open):
 
 Details and reasoning are in the [`spaceship` notes](#spaceship-spaceshipcom--unverified).
 
+**`godaddy` is unverified.** To promote it (do this when you have a live GoDaddy
+panel open):
+
+1. Open **DNS → DNS Records → Add New Record** and pick each Type
+   (MX / SRV / TXT / CNAME) in turn.
+2. Confirm three things:
+   - The exact field labels in the add form (the SRV form screenshot shows
+     `Type / Service / Protocol / Name / Value / Priority / Weight / Port`; check
+     the MX/TXT/CNAME forms match `Type / Name / Priority / Value` etc.).
+   - **Apex Name** is entered as `@` (what we ship), not left blank.
+   - Whether CNAME/MX/SRV targets (Value) need a trailing dot.
+3. Fix `records.json` if anything differs, then remove the `UNVERIFIED —` prefixes
+   from the four `godaddy` headers, and delete the unverified notes in
+   [`README.md`](README.md) and the `godaddy` section below.
+
+Details and reasoning are in the [`godaddy` notes](#godaddy-godaddycom--unverified).
+
 ## Providers
 
 | Provider      | Added      | Verification                                                                 |
@@ -35,6 +52,7 @@ Details and reasoning are in the [`spaceship` notes](#spaceship-spaceshipcom--un
 | `cosmotown`   | 2026-07-07 | Verified against a live panel (dexterica.com); quirks confirmed from a record-list screenshot. |
 | `bunny`       | 2026-07-13 | Verified against bunny.net's official docs (docs.bunny.net/docs/dns-records). |
 | `spaceship`   | 2026-07-13 | **Unverified.** Inferred from a zone-import screenshot + Spaceship's Spacemail docs. |
+| `godaddy`     | 2026-07-14 | **Unverified.** From GoDaddy's help docs + a live SRV add-form screenshot; not confirmed end-to-end. |
 
 ## Notes
 
@@ -104,3 +122,42 @@ Still **unverified** against a live manual add-record form:
 To promote to verified: capture the manual add-record form for one record of each
 type, confirm the field sets, then drop the `UNVERIFIED` prefixes in `records.json`
 and the note here and in [`README.md`](README.md).
+
+### `godaddy` (godaddy.com) — unverified
+
+Added 2026-07-14 for internal ticket 6850 (`6850_GODADDY_CUSTOM_DOMAIN`). Marked
+**unverified**: the conventions come from GoDaddy's official help articles plus a
+screenshot of the live **SRV** add-record form, but haven't been confirmed end-to-end
+by adding all 13 records on a live GoDaddy-hosted domain. Sources:
+[MX](https://www.godaddy.com/en-ca/help/add-an-mx-record-19234),
+[TXT](https://www.godaddy.com/en-ca/help/add-a-txt-record-19232),
+[SPF](https://www.godaddy.com/en-ca/help/add-an-spf-record-19218),
+[CNAME](https://www.godaddy.com/en-ca/help/add-a-cname-record-19236),
+[SRV](https://www.godaddy.com/en-ca/help/add-an-srv-record-19216).
+
+What the docs + screenshot establish and we encoded:
+
+- The add-record dialog is a **single form** with a **Type** dropdown (like `bunny`
+  / `spaceship`, not per-type sections like Cosmotown). Path: **Domain Portfolio →
+  domain → DNS → DNS Records → Add New Record**.
+- **Name** is entered as **`@` for the root domain** (GoDaddy uses `@`, not a blank
+  field — the `{host}` pattern, unlike bunny/cosmotown's blank apex).
+- **MX** has a separate **Priority** field; **Value** is the mail host alone.
+- **SRV** is the most decomposed of any provider: the form breaks the
+  `_service._protocol` label into separate **Service** (`_jmap`) and **Protocol**
+  (`_tcp`) fields, plus **Name** (`@` at the apex), **Value** (target), and separate
+  **Priority / Weight / Port**. This is the first provider to need it, so it added
+  `{service}` / `{protocol}` / `{srvhost}` tokens to the shared interpreter in
+  **both** `verify_thundermail_dns.py` and `app.js` (derived by splitting the SRV
+  host label on `.`; kept in sync per CLAUDE.md).
+- **SPF** is added as a plain **TXT** record (GoDaddy's SPF help article is just a
+  TXT with an SPF value), so it uses the TXT field set.
+- The provider headers carry an `UNVERIFIED —` prefix so CLI/web users see the
+  caveat inline.
+
+Still **unverified** against a live end-to-end add: the exact MX/TXT/CNAME field
+labels (only the SRV form was screenshotted), and whether any target Value needs a
+trailing dot. To promote: add one record of each type on a live GoDaddy-hosted
+domain, confirm 13/13 via `--resolver <the domain's GoDaddy authoritative NS>`, then
+drop the `UNVERIFIED` prefixes in `records.json` and the notes here and in
+[`README.md`](README.md).

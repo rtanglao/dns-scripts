@@ -95,6 +95,13 @@ def resolve_record(rec: dict, domain: str) -> dict:
     # Relative host label, empty at the apex — for panels (e.g. Cosmotown) whose
     # Host field is left blank for the root domain rather than written as "@".
     ctx["subhost"] = "" if host == "@" else host
+    # SRV panels (e.g. GoDaddy) that split the "_service._protocol" label into
+    # separate Service/Protocol fields, leaving Name as whatever remains ("@" at
+    # the apex, which is where all our SRV records live). Only meaningful for SRV.
+    labels = host.split(".")
+    ctx["service"] = labels[0]
+    ctx["protocol"] = labels[1] if len(labels) > 1 else ""
+    ctx["srvhost"] = ".".join(labels[2:]) or "@"
     return ctx
 
 

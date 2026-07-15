@@ -49,6 +49,13 @@ function resolveRecord(rec, domain) {
   // Relative host label, empty at the apex — for panels (e.g. Cosmotown) whose
   // Host field is left blank for the root domain rather than written as "@".
   ctx.subhost = host === "@" ? "" : host;
+  // SRV panels (e.g. GoDaddy) that split the "_service._protocol" label into
+  // separate Service/Protocol fields, leaving Name as whatever remains ("@" at
+  // the apex, which is where all our SRV records live). Only meaningful for SRV.
+  const labels = host.split(".");
+  ctx.service = labels[0];
+  ctx.protocol = labels[1] ?? "";
+  ctx.srvhost = labels.slice(2).join(".") || "@";
   return ctx;
 }
 

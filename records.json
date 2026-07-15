@@ -113,6 +113,24 @@
         "fields": [["Host", "{host}"], ["Type", "CNAME"], ["Value", "{target}"]]
       }
     },
+    "godaddy": {
+      "MX": {
+        "header": "UNVERIFIED — confirm the field names against your panel. GoDaddy → Domain Portfolio → your domain → DNS → DNS Records → Add New Record → Type MX. Name is @ for the root domain (GoDaddy uses @, not a blank field):",
+        "fields": [["Type", "MX"], ["Name", "{host}"], ["Priority", "{priority}"], ["Value", "{target}"]]
+      },
+      "SRV": {
+        "header": "UNVERIFIED — confirm the field names against your panel. GoDaddy → Domain Portfolio → your domain → DNS → DNS Records → Add New Record → Type SRV. GoDaddy splits the record into separate Service and Protocol fields; Name is @ for the root domain:",
+        "fields": [["Type", "SRV"], ["Service", "{service}"], ["Protocol", "{protocol}"], ["Name", "{srvhost}"], ["Value", "{target}"], ["Priority", "{priority}"], ["Weight", "{weight}"], ["Port", "{port}"]]
+      },
+      "TXT": {
+        "header": "UNVERIFIED — confirm the field names against your panel. GoDaddy → Domain Portfolio → your domain → DNS → DNS Records → Add New Record → Type TXT. Name is @ for the root domain:",
+        "fields": [["Type", "TXT"], ["Name", "{host}"], ["Value", "{value}"]]
+      },
+      "CNAME": {
+        "header": "UNVERIFIED — confirm the field names against your panel. GoDaddy → Domain Portfolio → your domain → DNS → DNS Records → Add New Record → Type CNAME:",
+        "fields": [["Type", "CNAME"], ["Name", "{host}"], ["Value", "{target}"]]
+      }
+    },
     "generic": {
       "MX": {
         "header": "Add this DNS record:",
