@@ -34,6 +34,14 @@ The checked set is 13 records: 1 MX, 5 SRV (jmap/caldavs/carddavs/imaps/submissi
   function — dnspython (CLI) vs a DoH `fetch` (web). These are intentionally
   duplicated in Python and JS; keep them in sync. The **hostname-validation regex**
   is likewise duplicated in both — keep it identical.
+- **SRV-label split tokens (`{service}`/`{protocol}`/`{srvhost}`).** The interpreter
+  also splits the SRV host label on `.`: `{service}` = first label (`_jmap`),
+  `{protocol}` = second (`_tcp`), `{srvhost}` = the rest or `@` (always `@` for our
+  records, which live at the apex). These exist **only for GoDaddy**, whose add-record
+  form breaks SRV into separate Service/Protocol/Name fields — every other provider
+  keeps the whole `_jmap._tcp` in one Host field. They're computed for all records but
+  only referenced by the `godaddy` SRV template. Like the rest of the interpreter,
+  the split is **duplicated in both Python and JS — keep it identical.**
 - **Interpolation contract (both languages, must match):** substitute `{domain}`
   into every string field first; then `{field}` tokens in templates resolve against
   the concrete record. `re.sub`/`String.replace` use a **function** replacement so
@@ -75,6 +83,30 @@ The checked set is 13 records: 1 MX, 5 SRV (jmap/caldavs/carddavs/imaps/submissi
   string in `Value` (the `{match}` template — e.g. `10 mail.thundermail.com`). The
   record list's `Weight` column is bunny's A/AAAA load-balancing "Routing Weight",
   not the SRV weight, so it's irrelevant here.
+  `godaddy` (**UNVERIFIED** — from GoDaddy's help docs + a screenshot of the live SRV
+  add-form, not yet confirmed end-to-end; headers carry an `UNVERIFIED —` prefix, drop
+  them once validated on a live GoDaddy-hosted domain). A single Add-record form with a
+  Type dropdown (like bunny). Apex `Name` is written as **`@`** (`{host}`), *not* blank
+  like bunny/cosmotown. MX has a separate `Priority`; SPF is a plain `TXT`. The
+  distinctive quirk: the **SRV form splits the record into separate `Service`
+  (`_jmap`) + `Protocol` (`_tcp`) + `Name` (`@`) fields** — the reason the
+  `{service}`/`{protocol}`/`{srvhost}` tokens exist. Note this is a *UI-layout*
+  difference only: contrast Spaceship, whose *import preview* also displayed a split
+  but whose API stores SRV as one combined `name` (`_jmap._tcp`) — so `spaceship` ships
+  the combined form and only `godaddy` splits it. Docs: GoDaddy Help CA articles for
+  [MX](https://www.godaddy.com/en-ca/help/add-an-mx-record-19234),
+  [TXT](https://www.godaddy.com/en-ca/help/add-a-txt-record-19232),
+  [SPF](https://www.godaddy.com/en-ca/help/add-an-spf-record-19218),
+  [CNAME](https://www.godaddy.com/en-ca/help/add-a-cname-record-19236),
+  [SRV](https://www.godaddy.com/en-ca/help/add-an-srv-record-19216).
+- **Bookmarkable web URLs (web-only).** `app.js` mirrors the form state (domain /
+  provider / resolver / fixformat) into the query string via `history.replaceState`,
+  and on load repopulates the fields and auto-runs when a `domain` is present. This is
+  the **one intentionally web-only feature** — the CLI has no URL, so the
+  Python/JS-in-sync rule does not apply. Untrusted params are validated against the
+  known option sets before use and only ever assigned to `input.value`/`select.value`
+  (never `innerHTML`); the domain still passes the hostname regex before any lookup —
+  so it adds no XSS surface and needs **no CSP change**.
 
 ## Security posture
 
@@ -84,7 +116,9 @@ preserve it when editing:
 - **Web renders only via `textContent`** (never `innerHTML`) and builds DoH URLs
   with `encodeURIComponent`. A **CSP `<meta>`** locks `script-src 'self'` and
   `connect-src` to the two DoH hosts + self. Don't introduce inline scripts,
-  `eval`, or `innerHTML` (they'd need CSP changes and reopen XSS).
+  `eval`, or `innerHTML` (they'd need CSP changes and reopen XSS). URL query params
+  (the bookmarkable-state feature) are untrusted input — validate against known
+  option sets and assign only to `input.value`/`select.value`, never `innerHTML`.
 - **CLI** escapes control/terminal bytes from DNS-derived output (`sanitize`),
   validates the domain against a hostname regex before any lookup (exit 2 on
   invalid), and caps displayed answer length.
