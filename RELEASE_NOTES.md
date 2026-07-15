@@ -15,9 +15,10 @@ panel open):
    (MX / SRV / TXT / CNAME) — the *manual* form, not the zone-import preview.
 2. Confirm three things:
    - The exact field labels in the add form (is it `Host` or `Hostname`? etc.).
-   - **SRV host** — does the form want it as one field (`_caldavs._tcp`, what we
-     ship) or split into service + protocol (`_caldavs` + `_tcp`, as the import
-     preview showed)?
+   - ~~**SRV host** — one field or split?~~ **Resolved 2026-07-14:** Spaceship's
+     public API models SRV with a single combined `name` (`_caldavs._tcp`), not a
+     split service/protocol — so the combined form we ship is correct (see the
+     `spaceship` notes below). The import-preview split was a UI display quirk.
    - Whether CNAME/MX targets need a trailing dot (the import preview stored one).
 3. Fix `records.json` if anything differs, then remove the `UNVERIFIED —` prefixes
    from the four `spaceship` headers, and delete the unverified notes in
@@ -113,11 +114,31 @@ What the sources agree on and we encoded:
 Still **unverified** against a live manual add-record form:
 
 - Exact field labels in the *add* form (vs. the import preview).
-- **SRV host**: the import view split it into `_caldavs` + `_tcp` (service +
-  protocol) fields; we encoded the combined `_caldavs._tcp` (matching the docs'
-  single `_autodiscover._tcp` hostname). Confirm which the add form expects.
 - Whether CNAME/MX targets need a trailing dot (the import view showed them stored
   with one).
+
+**SRV host — resolved 2026-07-14.** The import view split the SRV host into
+`_caldavs` + `_tcp` (service + protocol) fields, which cast doubt on the combined
+`_caldavs._tcp` we ship. Reading Spaceship's public API DNS model settles it: the API
+represents an SRV record with a **single combined `name`** (e.g. `_caldavs._tcp`) plus
+separate `priority` / `weight` / `port`, with **no split service/protocol** — confirmed
+against [docs.spaceship.dev](https://docs.spaceship.dev/) and the `dns.ts` schema in the
+community MCP server [`hlebtkachenko/spaceship-mcp`](https://github.com/hlebtkachenko/spaceship-mcp)
+(generic `name` / value / `priority` / `weight` / `port` per record). So the combined
+`_caldavs._tcp` is correct at the data level and the split was a display quirk of the
+*import* view. (Contrast `godaddy`, whose *manual add form* genuinely splits Service and
+Protocol into separate inputs — a UI-layout difference, not a difference in the stored
+record.)
+
+A community Spaceship **MCP server** (wraps the REST API; auth via
+`SPACESHIP_API_KEY` / `SPACESHIP_API_SECRET`) can drive a *functional* verification —
+create the 13 Thundermail records via its `ss_dns_save` tool on a live Spaceship-hosted
+domain, then `verify_thundermail_dns.py <domain> --resolver <Spaceship NS> --provider
+spaceship` should report 13/13 (same approach that validated `bunny` against
+`soylent.red`). That would confirm the record **values** and the combined-`name`
+decision, but the API is a different surface than the manual web form, so it still
+wouldn't nail the form's field **labels** (item 1) or the trailing-dot UI behavior
+(item 3) — a screenshot of the live add form remains the way to fully promote.
 
 To promote to verified: capture the manual add-record form for one record of each
 type, confirm the field sets, then drop the `UNVERIFIED` prefixes in `records.json`
