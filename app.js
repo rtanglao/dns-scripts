@@ -130,6 +130,42 @@ async function loadConfig() {
   }
 }
 
+// --- bookmarkable URL state --------------------------------------------------
+// Form state lives in the query string so a link can be bookmarked/shared and
+// re-run. Values are only ever assigned to input.value / select.value (never
+// innerHTML) and untrusted params are validated against known option sets before
+// use, so this adds no XSS surface and needs no CSP/connect-src change.
+
+function applyStateFromUrl() {
+  const params = new URLSearchParams(location.search);
+  const domain = params.get("domain");
+  if (domain) $("domain").value = domain.trim().replace(/\.$/, "");
+  const provider = params.get("provider");
+  if (provider !== null && (provider === "" || provider in CFG.providers)) {
+    $("provider").value = provider;
+  }
+  const resolver = params.get("resolver");
+  if (resolver && resolver in RESOLVERS) $("resolver").value = resolver;
+  const fixformat = params.get("fixformat");
+  if (fixformat === "table" || fixformat === "long") $("fixformat").value = fixformat;
+  // A shared/bookmarked link that names a domain runs immediately.
+  if ($("domain").value) $("form").requestSubmit();
+}
+
+function updateUrl() {
+  const params = new URLSearchParams();
+  const domain = $("domain").value.trim().replace(/\.$/, "");
+  if (domain) params.set("domain", domain);
+  if ($("provider").value) params.set("provider", $("provider").value);
+  // Omit the defaults (cloudflare / table) to keep shared URLs tidy.
+  if ($("resolver").value && $("resolver").value !== "cloudflare")
+    params.set("resolver", $("resolver").value);
+  if ($("fixformat").value && $("fixformat").value !== "table")
+    params.set("fixformat", $("fixformat").value);
+  const qs = params.toString();
+  history.replaceState(null, "", qs ? `${location.pathname}?${qs}` : location.pathname);
+}
+
 function el(tag, cls, text) {
   const e = document.createElement(tag);
   if (cls) e.className = cls;
@@ -143,6 +179,8 @@ async function runCheck(evt) {
   if (!domain) return;
   const provider = $("provider").value;
   const resolver = $("resolver").value;
+
+  updateUrl(); // reflect current form state into the (bookmarkable) URL
 
   if (!HOSTNAME.test(domain)) {
     $("results").replaceChildren();
@@ -231,4 +269,5 @@ async function runCheck(evt) {
 
 loadConfig().then(() => {
   $("form").addEventListener("submit", runCheck);
+  applyStateFromUrl();
 });
