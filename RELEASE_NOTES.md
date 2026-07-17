@@ -66,6 +66,30 @@ target: `verify_thundermail_dns.py clayzahrobsky.com` should report 13/13.
 
 Details and reasoning are in the [`ionos` notes](#ionos-ionoscom--unverified).
 
+**`ovh` is unverified.** To promote it (do this when you have a live OVHcloud panel
+open):
+
+1. Open **Web Cloud → DNS zones → your domain → DNS zone → Add an entry** and pick each
+   type (MX / SRV / TXT / CNAME) in turn.
+2. Confirm three things:
+   - The exact field labels in each wizard (the TXT/SPF wizard screenshot shows
+     `Sub-domain / TTL / Value`; the **MX** and **SRV** wizards were **not**
+     screenshotted — verify their labels and, for SRV, whether Priority/Weight/Port/
+     Target are separate fields or one combined string).
+   - **Apex Sub-domain** is left **empty** (what we ship), not `@`.
+   - Whether **MX and SRV targets need a trailing dot** (we ship one on all FQDN
+     targets, since the docs say OVH appends your domain to an unpunctuated target;
+     the CNAME trailing dot is documented, MX/SRV is inferred).
+3. Fix `records.json` if anything differs, then remove the `UNVERIFIED —` prefixes
+   from the four `ovh` headers, and delete the unverified notes in
+   [`README.md`](README.md) and the `ovh` section below.
+
+`vntc.it` is already correctly configured on OVH (NS `ns200.anycast.me`), so it is a
+ready-made target: `verify_thundermail_dns.py vntc.it` should report 13/13, and
+`--resolver ns200.anycast.me` queries OVH authoritatively.
+
+Details and reasoning are in the [`ovh` notes](#ovh-ovhcloudcom--unverified).
+
 ## Providers
 
 | Provider      | Added      | Verification                                                                 |
@@ -78,6 +102,7 @@ Details and reasoning are in the [`ionos` notes](#ionos-ionoscom--unverified).
 | `spaceship`   | 2026-07-13 | **Unverified.** Inferred from a zone-import screenshot + Spaceship's Spacemail docs. |
 | `godaddy`     | 2026-07-14 | **Unverified.** From GoDaddy's help docs + a live SRV add-form screenshot; not confirmed end-to-end. |
 | `ionos`       | 2026-07-16 | **Unverified.** From IONOS's help docs + a live SRV add-form screenshot; not confirmed end-to-end. |
+| `ovh`         | 2026-07-16 | **Unverified.** From OVHcloud's help docs + a live TXT/SPF wizard screenshot; MX/SRV wizards not screenshotted. |
 
 ## Notes
 
@@ -250,3 +275,44 @@ configured on IONOS, so confirm 13/13 with `verify_thundermail_dns.py clayzahrob
 eyeball the emitted `ionos` fix strings against the live panel, then drop the
 `UNVERIFIED` prefixes in `records.json` and the notes here and in
 [`README.md`](README.md).
+
+### `ovh` (ovhcloud.com) — unverified
+
+Added 2026-07-16 for internal ticket 6837 (`6837_OVH_DNS_PROVIDER_vntc.t`, sample domain
+`vntc.it`). Marked **unverified**: the conventions come from three OVHcloud help articles
+plus a screenshot of the live **TXT/SPF** add-entry wizard, but the **MX** and **SRV**
+wizard field layouts were not screenshotted and haven't been confirmed end-to-end. Sources
+(OVHcloud Documentation): *Editing an OVHcloud DNS zone*
+(docs.ovhcloud.com/en/guides/web-cloud/domains/dns-zone-edit), *Everything you need to know
+about DNS zone*, *How to improve email security with an SPF record*
+(docs.ovhcloud.com/en/guides/web-cloud/domains/dns-zone-spf).
+
+What the docs + screenshot establish and we encoded:
+
+- Records are added through a **3-step "Add an entry to the DNS zone" wizard** reached from
+  the DNS zone table (**Web Cloud → DNS zones → domain → DNS zone → Add an entry**), not a
+  flat single form. Step 1 picks the type (A/AAAA/NS/CNAME; CAA/TXT/NAPTR/SRV/…;
+  MX/SPF/DKIM/DMARC).
+- **Apex Sub-domain is left empty** — the wizard shows the `.yourdomain` suffix beside the
+  field and appends it automatically (the `{subhost}` pattern, like bunny/cosmotown, not
+  `@`).
+- ⚠️ **FQDN targets need a trailing dot.** The docs are explicit for CNAME/URL targets ("if
+  you do not punctuate it, your domain name will be automatically added to the end"), so all
+  `ovh` MX/SRV/CNAME targets are emitted with a trailing `.` (encoded as `{target}.`). OVH
+  is the first provider to require this. The CNAME dot is documented; the MX/SRV dot is
+  inferred from the same rule and still needs live confirmation.
+- **SRV keeps the `_service._protocol` label combined** in Sub-domain (`{host}`, e.g.
+  `_jmap._tcp`) — OVH does **not** split Service/Protocol like `godaddy`/`ionos`, so the
+  existing tokens suffice and **no interpreter change was needed**.
+- **SPF** uses the plain **TXT** path; the header steers users away from OVH's "Add an
+  OVHcloud SPF record" button (which injects `include:mx.ovh.com`).
+- The provider headers carry an `UNVERIFIED —` prefix so CLI/web users see the caveat
+  inline.
+
+Still **unverified** against a live end-to-end add: the exact **MX** and **SRV** wizard
+field labels (only the TXT/SPF wizard was screenshotted), whether the SRV wizard uses
+separate Priority/Weight/Port/Target fields, and whether MX/SRV targets truly need the
+trailing dot. To promote: `vntc.it` is already correctly configured on OVH, so confirm 13/13
+with `verify_thundermail_dns.py vntc.it` (or `--resolver ns200.anycast.me`), eyeball the
+emitted `ovh` fix strings against the live panel, then drop the `UNVERIFIED` prefixes in
+`records.json` and the notes here and in [`README.md`](README.md).

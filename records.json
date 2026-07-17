@@ -149,6 +149,24 @@
         "fields": [["Type", "CNAME"], ["Hostname", "{host}"], ["Point to", "{target}"]]
       }
     },
+    "ovh": {
+      "MX": {
+        "header": "UNVERIFIED — confirm the field names against your panel. OVHcloud → Web Cloud → DNS zones → select your domain → DNS zone tab → Add an entry → MX. Leave Sub-domain empty for the root domain (OVH appends your domain); enter the Target with a trailing dot:",
+        "fields": [["Type", "MX"], ["Sub-domain", "{subhost}"], ["Priority", "{priority}"], ["Target", "{target}."]]
+      },
+      "SRV": {
+        "header": "UNVERIFIED — confirm the field names against your panel (the SRV wizard layout is not yet screenshotted). OVHcloud → Web Cloud → DNS zones → select your domain → DNS zone tab → Add an entry → SRV. Keep the whole _service._protocol label in Sub-domain; enter the Target with a trailing dot:",
+        "fields": [["Type", "SRV"], ["Sub-domain", "{host}"], ["Priority", "{priority}"], ["Weight", "{weight}"], ["Port", "{port}"], ["Target", "{target}."]]
+      },
+      "TXT": {
+        "header": "UNVERIFIED — confirm the field names against your panel. OVHcloud → Web Cloud → DNS zones → select your domain → DNS zone tab → Add an entry → TXT. Leave Sub-domain empty for the root domain. For SPF, choose TXT (not the 'OVHcloud SPF' button, which injects include:mx.ovh.com):",
+        "fields": [["Type", "TXT"], ["Sub-domain", "{subhost}"], ["Value", "{value}"]]
+      },
+      "CNAME": {
+        "header": "UNVERIFIED — confirm the field names against your panel. OVHcloud → Web Cloud → DNS zones → select your domain → DNS zone tab → Add an entry → CNAME. Enter the Target WITH a trailing dot (OVH appends your domain otherwise):",
+        "fields": [["Type", "CNAME"], ["Sub-domain", "{host}"], ["Target", "{target}."]]
+      }
+    },
     "generic": {
       "MX": {
         "header": "Add this DNS record:",

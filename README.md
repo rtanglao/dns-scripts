@@ -78,7 +78,7 @@ uv run verify_thundermail_dns.py <domain> --resolver kiki.bunny.net
 Pass `--provider` to print, for each **failing** record, exactly what to enter in
 that DNS provider's control panel — including provider-specific quirks such as how
 the Host/Name field is written. Supported: `namecheap`, `squarespace`, `cosmotown`,
-`bunny`, `spaceship`, `godaddy`, `ionos`, `generic`. bunny.net's add-record form has a single
+`bunny`, `spaceship`, `godaddy`, `ionos`, `ovh`, `generic`. bunny.net's add-record form has a single
 **Value** field (no separate Priority/Weight/Port), so the `bunny` MX/SRV output puts
 the whole record string in Value; the Hostname field is left empty for the root
 ([bunny.net: DNS records](https://docs.bunny.net/docs/dns-records)). **`spaceship`
@@ -96,7 +96,13 @@ add-record form, not yet confirmed end-to-end on a live IONOS-hosted domain, so 
 headers flag this. IONOS also splits the SRV `_service._protocol` label, but its
 Protocol is a `TCP`/`UDP`/`TLS` dropdown (hard-coded to `TCP`, since every checked
 SRV record is `_tcp`), and its SRV form has both a **Host name** (record location)
-and a separate **Points to** (target). Note that
+and a separate **Points to** (target). **`ovh` is also unverified** — its field
+conventions come from OVHcloud's help docs plus a screenshot of the live TXT/SPF
+add-entry wizard, not yet confirmed end-to-end (the MX/SRV wizards weren't
+screenshotted), so its headers flag this. OVH's quirks: the **Sub-domain** field is
+left **empty** for the root (not `@`), and FQDN **targets need a trailing dot** (OVH
+appends your domain otherwise), so the `ovh` MX/SRV/CNAME output ends targets with a
+`.`. Note that
 Cosmotown's customer panel has no SRV section, so the five SRV
 records can't be self-served — the `cosmotown` output routes you to Cosmotown support
 for those. See Cosmotown's docs for
