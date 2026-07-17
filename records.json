@@ -131,6 +131,24 @@
         "fields": [["Type", "CNAME"], ["Name", "{host}"], ["Value", "{target}"]]
       }
     },
+    "ionos": {
+      "MX": {
+        "header": "UNVERIFIED — confirm the field names against your panel. IONOS → Domains & SSL → the gear next to your domain under Actions → DNS → ADD RECORD → MX. Host name is @ for the root domain:",
+        "fields": [["Type", "MX"], ["Host name", "{host}"], ["Points to", "{target}"], ["Priority", "{priority}"]]
+      },
+      "SRV": {
+        "header": "UNVERIFIED — confirm the field names against your panel. IONOS → Domains & SSL → the gear next to your domain under Actions → DNS → ADD RECORD → SRV. IONOS splits the record into separate Service and Protocol fields (Protocol is a TCP/UDP/TLS dropdown — choose TCP); Host name is @ for the root domain and Points to is the target:",
+        "fields": [["Type", "SRV"], ["Service", "{service}"], ["Protocol", "TCP"], ["Host name", "{srvhost}"], ["Points to", "{target}"], ["Priority", "{priority}"], ["Weight", "{weight}"], ["Port", "{port}"]]
+      },
+      "TXT": {
+        "header": "UNVERIFIED — confirm the field names against your panel. IONOS → Domains & SSL → the gear next to your domain under Actions → DNS → ADD RECORD → TXT. Host name is @ for the root domain. For SPF: IONOS may already have added its own SPF TXT (v=spf1 include:_spf-us.ionos.com ~all) — replace/merge it so only one SPF record remains:",
+        "fields": [["Type", "TXT"], ["Host name", "{host}"], ["Value", "{value}"]]
+      },
+      "CNAME": {
+        "header": "UNVERIFIED — confirm the field names against your panel. IONOS reaches CNAME via Domains & SSL → the gear next to your domain → Manage Subdomains → the gear on the subdomain → DNS → ADD RECORD → CNAME. Enter the target without a trailing dot:",
+        "fields": [["Type", "CNAME"], ["Hostname", "{host}"], ["Point to", "{target}"]]
+      }
+    },
     "generic": {
       "MX": {
         "header": "Add this DNS record:",

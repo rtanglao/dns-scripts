@@ -43,6 +43,29 @@ panel open):
 
 Details and reasoning are in the [`godaddy` notes](#godaddy-godaddycom--unverified).
 
+**`ionos` is unverified.** To promote it (do this when you have a live IONOS panel
+open):
+
+1. Open **Domains & SSL → gear next to the domain → DNS → ADD RECORD** and pick each
+   Type (MX / SRV / TXT / CNAME) in turn. CNAME is reached via **Manage Subdomains →
+   gear on the subdomain → DNS** instead.
+2. Confirm three things:
+   - The exact field labels in the add form (the SRV form screenshot shows
+     `Type / Service / Protocol / Host name / Points to / Priority / Weight / Port`;
+     check MX/TXT match `Host name / Points to / Value` and CNAME uses
+     `Hostname / Point to`).
+   - **Apex Host name** is entered as `@` (what we ship) for MX/TXT, not left blank.
+   - Whether the SRV **Protocol** dropdown offer matches `TCP` and whether any target
+     needs a trailing dot (the CNAME doc says enter it without one).
+3. Fix `records.json` if anything differs, then remove the `UNVERIFIED —` prefixes
+   from the four `ionos` headers, and delete the unverified notes in
+   [`README.md`](README.md) and the `ionos` section below.
+
+`clayzahrobsky.com` is already correctly configured on IONOS, so it is a ready-made
+target: `verify_thundermail_dns.py clayzahrobsky.com` should report 13/13.
+
+Details and reasoning are in the [`ionos` notes](#ionos-ionoscom--unverified).
+
 ## Providers
 
 | Provider      | Added      | Verification                                                                 |
@@ -54,6 +77,7 @@ Details and reasoning are in the [`godaddy` notes](#godaddy-godaddycom--unverifi
 | `bunny`       | 2026-07-13 | Verified against bunny.net's official docs (docs.bunny.net/docs/dns-records). |
 | `spaceship`   | 2026-07-13 | **Unverified.** Inferred from a zone-import screenshot + Spaceship's Spacemail docs. |
 | `godaddy`     | 2026-07-14 | **Unverified.** From GoDaddy's help docs + a live SRV add-form screenshot; not confirmed end-to-end. |
+| `ionos`       | 2026-07-16 | **Unverified.** From IONOS's help docs + a live SRV add-form screenshot; not confirmed end-to-end. |
 
 ## Notes
 
@@ -181,4 +205,48 @@ labels (only the SRV form was screenshotted), and whether any target Value needs
 trailing dot. To promote: add one record of each type on a live GoDaddy-hosted
 domain, confirm 13/13 via `--resolver <the domain's GoDaddy authoritative NS>`, then
 drop the `UNVERIFIED` prefixes in `records.json` and the notes here and in
+[`README.md`](README.md).
+
+### `ionos` (ionos.com) — unverified
+
+Added 2026-07-16 for internal ticket 6911 (`6911_IONOS_DNS_CLAYZAHROBSKY_DOT_COM`,
+domain `clayzahrobsky.com`). Marked **unverified**: the conventions come from six IONOS
+help articles plus a screenshot of the live **SRV** add-record form, but haven't been
+confirmed end-to-end by adding all 13 records on a live IONOS-hosted domain. Sources
+(IONOS Help): *Using a Domain with Another Provider's Mail Servers (Editing MX
+Records)*, *Managing TXT Records*, *Managing SRV Records*, *Configuring a DMARC Record
+for a Domain*, *Configuring a CNAME Record for a Subdomain*, *Using IONOS SPF to
+Improve Email Delivery*.
+
+What the docs + screenshot establish and we encoded:
+
+- The add-record dialog is a **single form** with a **Type** dropdown (like `godaddy`
+  / `bunny` / `spaceship`, not per-type sections like Cosmotown). Path: **Domains & SSL
+  → gear next to the domain → DNS → ADD RECORD**.
+- **Host name** is entered as **`@` for the root domain** for MX/TXT (the `{host}`
+  pattern, not blank like bunny/cosmotown).
+- **MX** has a separate **Priority** field; **Points to** is the mail host alone.
+- **SRV** is decomposed like GoDaddy — the form splits `_service._protocol` into
+  **Service** (`_jmap`) and **Protocol** fields — but with two IONOS-specific twists:
+  (1) **Protocol is a `TCP`/`UDP`/`TLS` dropdown**, so `{protocol}` (which yields
+  `_tcp`) would not match an option; it is **hard-coded to `TCP`** because all five
+  checked SRV records are `_tcp`. (2) The form has both a **Host name** (record
+  location → `{srvhost}`, `@` at the apex) and a separate **Points to** (target),
+  one field more than GoDaddy's SRV form. This reuses the `{service}` / `{srvhost}`
+  tokens already added for `godaddy`, so no interpreter change was needed.
+- **SPF** is a plain **TXT** record. IONOS enables its own "IONOS SPF" by default and
+  may already have added a TXT (`v=spf1 include:_spf-us.ionos.com ~all`); the TXT
+  header notes that the user must replace/merge it so only one SPF record remains.
+- **CNAME** is reached via **Manage Subdomains → gear on the subdomain → DNS** (not the
+  main DNS tab), and its fields are labelled **Hostname** / **Point to** (vs
+  **Host name** / **Points to** elsewhere); the target is entered without a trailing dot.
+- The provider headers carry an `UNVERIFIED —` prefix so CLI/web users see the caveat
+  inline.
+
+Still **unverified** against a live end-to-end add: the exact MX/TXT/CNAME field labels
+(only the SRV form was screenshotted), the SRV Protocol dropdown values, and whether any
+target needs a trailing dot. To promote: `clayzahrobsky.com` is already correctly
+configured on IONOS, so confirm 13/13 with `verify_thundermail_dns.py clayzahrobsky.com`,
+eyeball the emitted `ionos` fix strings against the live panel, then drop the
+`UNVERIFIED` prefixes in `records.json` and the notes here and in
 [`README.md`](README.md).
