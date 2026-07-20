@@ -78,7 +78,7 @@ uv run verify_thundermail_dns.py <domain> --resolver kiki.bunny.net
 Pass `--provider` to print, for each **failing** record, exactly what to enter in
 that DNS provider's control panel — including provider-specific quirks such as how
 the Host/Name field is written. Supported: `namecheap`, `squarespace`, `cosmotown`,
-`bunny`, `spaceship`, `godaddy`, `ionos`, `ovh`, `generic`. bunny.net's add-record form has a single
+`bunny`, `spaceship`, `godaddy`, `ionos`, `ovh`, `hover`, `generic`. bunny.net's add-record form has a single
 **Value** field (no separate Priority/Weight/Port), so the `bunny` MX/SRV output puts
 the whole record string in Value; the Hostname field is left empty for the root
 ([bunny.net: DNS records](https://docs.bunny.net/docs/dns-records)). **`spaceship`
@@ -102,7 +102,14 @@ add-entry wizard, not yet confirmed end-to-end (the MX/SRV wizards weren't
 screenshotted), so its headers flag this. OVH's quirks: the **Sub-domain** field is
 left **empty** for the root (not `@`), and FQDN **targets need a trailing dot** (OVH
 appends your domain otherwise), so the `ovh` MX/SRV/CNAME output ends targets with a
-`.`. Note that
+`.`. **`hover` is also unverified** — its SRV field layout comes from a screenshot of
+the live *Edit DNS Record* form, but the MX/TXT/CNAME field labels come from Hover's
+[Managing DNS Records at Hover](https://support.hover.com/support/solutions/articles/) docs
+(not a live add-record screenshot), so its headers flag this. Hover splits the SRV
+`_service._protocol` label into separate **Service** and **Protocol** fields (like GoDaddy/IONOS),
+but its optional **Subdomain** field is left **empty** for the root (not `@` — the `hover`
+SRV output uses a blank subdomain, driven by a `{srvsubhost}` token); MX/TXT use `@` for the
+root. Note that
 Cosmotown's customer panel has no SRV section, so the five SRV
 records can't be self-served — the `cosmotown` output routes you to Cosmotown support
 for those. See Cosmotown's docs for

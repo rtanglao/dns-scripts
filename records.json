@@ -167,6 +167,24 @@
         "fields": [["Type", "CNAME"], ["Sub-domain", "{host}"], ["Target", "{target}."]]
       }
     },
+    "hover": {
+      "MX": {
+        "header": "UNVERIFIED — confirm the field names against your panel. Hover → your domain → DNS section → Add a record → Type MX. Hostname is @ for the root domain (Hover uses @, per its docs):",
+        "fields": [["Type", "MX"], ["Hostname", "{host}"], ["Priority", "{priority}"], ["Mail Server", "{target}"]]
+      },
+      "SRV": {
+        "header": "UNVERIFIED — confirm the field names against your panel (the SRV layout is from a live Edit-DNS-Record screenshot). Hover → your domain → DNS section → Add a record → Type SRV. Hover splits the record into separate Service and Protocol fields; leave the Subdomain (optional) field BLANK for the root domain (do NOT type @ — the panel shows your domain beside the empty box):",
+        "fields": [["Type", "SRV"], ["Service", "{service}"], ["Protocol", "{protocol}"], ["Subdomain", "{srvsubhost}"], ["Priority", "{priority}"], ["Weight", "{weight}"], ["Port", "{port}"], ["Server", "{target}"]]
+      },
+      "TXT": {
+        "header": "UNVERIFIED — confirm the field names against your panel. Hover → your domain → DNS section → Add a record → Type TXT. Hostname is @ for the root domain:",
+        "fields": [["Type", "TXT"], ["Hostname", "{host}"], ["Content", "{value}"]]
+      },
+      "CNAME": {
+        "header": "UNVERIFIED — confirm the field names against your panel. Hover → your domain → DNS section → Add a record → Type CNAME (Hover can't set a CNAME on the root domain, but every DKIM record is on a subdomain, so that's fine). Enter the target without a trailing dot:",
+        "fields": [["Type", "CNAME"], ["Hostname", "{host}"], ["Target Name", "{target}"]]
+      }
+    },
     "generic": {
       "MX": {
         "header": "Add this DNS record:",

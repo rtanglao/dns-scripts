@@ -102,6 +102,9 @@ def resolve_record(rec: dict, domain: str) -> dict:
     ctx["service"] = labels[0]
     ctx["protocol"] = labels[1] if len(labels) > 1 else ""
     ctx["srvhost"] = ".".join(labels[2:]) or "@"
+    # Like srvhost but blank (not "@") at the apex — for Hover's SRV form, whose
+    # optional Subdomain field is left empty for the root domain.
+    ctx["srvsubhost"] = ".".join(labels[2:])
     return ctx
 
 

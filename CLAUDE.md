@@ -40,8 +40,12 @@ The checked set is 13 records: 1 MX, 5 SRV (jmap/caldavs/carddavs/imaps/submissi
   records, which live at the apex). These exist **only for GoDaddy**, whose add-record
   form breaks SRV into separate Service/Protocol/Name fields — every other provider
   keeps the whole `_jmap._tcp` in one Host field. They're computed for all records but
-  only referenced by the `godaddy` SRV template. Like the rest of the interpreter,
-  the split is **duplicated in both Python and JS — keep it identical.**
+  only referenced by the split-SRV templates (`godaddy`, `ionos`, `hover`). There's a
+  sibling token **`{srvsubhost}`** = the same "rest" label but **blank at the apex
+  instead of `@`** (mirroring how `{subhost}` relates to `{host}`); it exists only for
+  Hover, whose SRV form leaves the optional Subdomain field empty for the root. Like the
+  rest of the interpreter, the split is **duplicated in both Python and JS — keep it
+  identical.**
 - **Interpolation contract (both languages, must match):** substitute `{domain}`
   into every string field first; then `{field}` tokens in templates resolve against
   the concrete record. `re.sub`/`String.replace` use a **function** replacement so
@@ -99,6 +103,18 @@ The checked set is 13 records: 1 MX, 5 SRV (jmap/caldavs/carddavs/imaps/submissi
   [SPF](https://www.godaddy.com/en-ca/help/add-an-spf-record-19218),
   [CNAME](https://www.godaddy.com/en-ca/help/add-a-cname-record-19236),
   [SRV](https://www.godaddy.com/en-ca/help/add-an-srv-record-19216).
+  `hover` (**UNVERIFIED** — the SRV field layout is confirmed from a screenshot of the
+  live *Edit DNS Record* form; MX/TXT/CNAME field labels come from Hover's
+  [Managing DNS Records at Hover](https://support.hover.com/) docs, not a live add-record
+  screenshot; drop the `UNVERIFIED —` prefixes once confirmed end-to-end — `mitchener.ca`
+  is the verify target, hosted on `ns1`/`ns2.hover.com`). A single **Add a record** form
+  with a Type dropdown (like bunny/godaddy). MX and TXT write the apex host as **`@`**
+  (`{host}`, per Hover's docs). The distinctive quirk: like GoDaddy/IONOS, the **SRV form
+  splits the label into separate `Service` (`_jmap`) + `Protocol` (`_tcp`) fields** — but
+  its optional `Subdomain` field is left **blank** for the apex (`{srvsubhost}`, *not*
+  `@`; the panel shows your domain beside the empty box). MX uses `Mail Server` for the
+  target, TXT uses `Content`, CNAME uses `Target Name` (no trailing dot); Hover can't set
+  a CNAME on the root, but every DKIM CNAME is on a subdomain so that's a non-issue.
 - **Bookmarkable web URLs (web-only).** `app.js` mirrors the form state (domain /
   provider / resolver / fixformat) into the query string via `history.replaceState`,
   and on load repopulates the fields and auto-runs when a `domain` is present. This is

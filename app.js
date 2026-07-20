@@ -56,6 +56,9 @@ function resolveRecord(rec, domain) {
   ctx.service = labels[0];
   ctx.protocol = labels[1] ?? "";
   ctx.srvhost = labels.slice(2).join(".") || "@";
+  // Like srvhost but blank (not "@") at the apex — for Hover's SRV form, whose
+  // optional Subdomain field is left empty for the root domain.
+  ctx.srvsubhost = labels.slice(2).join(".");
   return ctx;
 }
 
