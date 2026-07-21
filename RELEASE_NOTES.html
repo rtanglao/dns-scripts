@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<!-- This Source Code Form is subject to the terms of the Mozilla Public
+     License, v. 2.0. If a copy of the MPL was not distributed with this
+     file, You can obtain one at https://mozilla.org/MPL/2.0/. -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Static page, no scripts or network of its own. -->
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'none'; style-src 'unsafe-inline'; img-src 'self'; base-uri 'none'; form-action 'none'">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <title>Release notes — Thundermail DNS checker</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #ffffff; --fg: #1a1a1a; --muted: #666; --border: #ddd;
+      --card: #f6f6f6; --ok: #1a7f37; --fail: #cf222e; --accent: #0b5fff;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #14161a; --fg: #e6e6e6; --muted: #9aa0a6; --border: #333;
+        --card: #1d2027; --ok: #3fb950; --fail: #f85149; --accent: #4c8dff;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; padding: 2rem 1rem; background: var(--bg); color: var(--fg);
+      font: 16px/1.6 system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    }
+    main { max-width: 820px; margin: 0 auto; }
+    h1 { font-size: 1.5rem; margin: 0 0 1rem; }
+    h2 { font-size: 1.1rem; margin: 0; display: inline; }
+    h3 { font-size: 1rem; margin: 1.5rem 0 .5rem; }
+    p { margin: 0 0 1rem; }
+    a { color: var(--accent); }
+    code { background: var(--card); padding: .05rem .3rem; border-radius: 4px;
+      font: .88em ui-monospace, SFMono-Regular, Menlo, monospace; }
+    ul, ol { padding-left: 1.4rem; }
+    li { margin: .25rem 0; }
+    table { border-collapse: collapse; width: 100%; margin: 0 0 1.5rem;
+      font-size: .92rem; }
+    th, td { text-align: left; padding: .4rem .6rem; border-bottom: 1px solid var(--border);
+      vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; white-space: nowrap; }
+    details { background: var(--card); border: 1px solid var(--border);
+      border-radius: 10px; padding: .75rem 1rem; margin: 1rem 0; }
+    summary { cursor: pointer; font-weight: 600; }
+    .nav { margin-bottom: 1.5rem; }
+    .lede { color: var(--muted); }
+  </style>
+</head>
+<body>
+  <main>
+    <p class="nav"><a href="index.html">← Back to the DNS checker</a></p>
+
+    <h1>Release notes</h1>
+
+    <p class="lede">Chronological record of provider-remediation support added to
+      <code>dns-scripts</code>. Each provider is pure data in
+      <a href="https://github.com/thunderbird/dns-scripts/blob/main/records.json"><code>records.json</code></a>;
+      both front-ends (the <code>verify_thundermail_dns.py</code> CLI and the
+      <code>index.html</code>/<code>app.js</code> web app) pick it up automatically.
+      See <a href="https://github.com/thunderbird/dns-scripts/blob/main/CONTRIBUTING.md"><code>CONTRIBUTING.md</code></a>
+      for the onboarding workflow and the verification bar every provider is held to.</p>
+
+    <h2 style="display:block; font-size:1.2rem; margin:0 0 .5rem;">Providers</h2>
+    <table>
+      <thead>
+        <tr><th>Provider</th><th>Added</th><th>Verification</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>namecheap</code></td><td>2026-07-02</td><td>Field conventions verified against Namecheap's docs.</td></tr>
+        <tr><td><code>squarespace</code></td><td>2026-07-02</td><td>Field conventions verified against Squarespace's docs.</td></tr>
+        <tr><td><code>generic</code></td><td>2026-07-02</td><td>Provider-agnostic FQDN/value fallback — nothing panel-specific to verify.</td></tr>
+        <tr><td><code>cosmotown</code></td><td>2026-07-07</td><td>Verified against a live panel (dexterica.com); quirks confirmed from a record-list screenshot.</td></tr>
+        <tr><td><code>bunny</code></td><td>2026-07-13</td><td>Verified against bunny.net's official docs (docs.bunny.net/docs/dns-records).</td></tr>
+        <tr><td><code>spaceship</code></td><td>2026-07-13</td><td><strong>Unverified.</strong> Inferred from a zone-import screenshot + Spaceship's Spacemail docs.</td></tr>
+        <tr><td><code>godaddy</code></td><td>2026-07-14</td><td><strong>Unverified.</strong> From GoDaddy's help docs + a live SRV add-form screenshot; not confirmed end-to-end.</td></tr>
+        <tr><td><code>ionos</code></td><td>2026-07-16</td><td><strong>Unverified.</strong> From IONOS's help docs + a live SRV add-form screenshot; not confirmed end-to-end.</td></tr>
+        <tr><td><code>ovh</code></td><td>2026-07-16</td><td><strong>Unverified.</strong> From OVHcloud's help docs + a live TXT/SPF wizard screenshot; MX/SRV wizards not screenshotted.</td></tr>
+      </tbody>
+    </table>
+
+    <details>
+      <summary><h2>⚠️ Pending verification</h2></summary>
+
+      <p style="margin-top:1rem;"><strong><code>spaceship</code> is unverified.</strong> To promote it (do this when you have a live Spaceship
+      panel open):</p>
+      <ol>
+        <li>Open the panel and click <strong>+ Add record</strong> for one record of each type
+          (MX / SRV / TXT / CNAME) — the <em>manual</em> form, not the zone-import preview.</li>
+        <li>Confirm three things:
+          <ul>
+            <li>The exact field labels in the add form (is it <code>Host</code> or <code>Hostname</code>? etc.).</li>
+            <li><del><strong>SRV host</strong> — one field or split?</del> <strong>Resolved 2026-07-14:</strong> Spaceship's
+              public API models SRV with a single combined <code>name</code> (<code>_caldavs._tcp</code>), not a
+              split service/protocol — so the combined form we ship is correct (see the
+              <code>spaceship</code> notes below). The import-preview split was a UI display quirk.</li>
+            <li>Whether CNAME/MX targets need a trailing dot (the import preview stored one).</li>
+          </ul>
+        </li>
+        <li>Fix <code>records.json</code> if anything differs, then remove the <code>UNVERIFIED —</code> prefixes
+          from the four <code>spaceship</code> headers, and delete the unverified notes in
+          <a href="https://github.com/thunderbird/dns-scripts/blob/main/README.md"><code>README.md</code></a> and the <code>spaceship</code> section below.</li>
+      </ol>
+      <p>Details and reasoning are in the <a href="#spaceship-spaceshipcom--unverified"><code>spaceship</code> notes</a>.</p>
+
+      <p><strong><code>godaddy</code> is unverified.</strong> To promote it (do this when you have a live GoDaddy
+      panel open):</p>
+      <ol>
+        <li>Open <strong>DNS → DNS Records → Add New Record</strong> and pick each Type
+          (MX / SRV / TXT / CNAME) in turn.</li>
+        <li>Confirm three things:
+          <ul>
+            <li>The exact field labels in the add form (the SRV form screenshot shows
+              <code>Type / Service / Protocol / Name / Value / Priority / Weight / Port</code>; check
+              the MX/TXT/CNAME forms match <code>Type / Name / Priority / Value</code> etc.).</li>
+            <li><strong>Apex Name</strong> is entered as <code>@</code> (what we ship), not left blank.</li>
+            <li>Whether CNAME/MX/SRV targets (Value) need a trailing dot.</li>
+          </ul>
+        </li>
+        <li>Fix <code>records.json</code> if anything differs, then remove the <code>UNVERIFIED —</code> prefixes
+          from the four <code>godaddy</code> headers, and delete the unverified notes in
+          <a href="https://github.com/thunderbird/dns-scripts/blob/main/README.md"><code>README.md</code></a> and the <code>godaddy</code> section below.</li>
+      </ol>
+      <p>Details and reasoning are in the <a href="#godaddy-godaddycom--unverified"><code>godaddy</code> notes</a>.</p>
+
+      <p><strong><code>ionos</code> is unverified.</strong> To promote it (do this when you have a live IONOS panel
+      open):</p>
+      <ol>
+        <li>Open <strong>Domains &amp; SSL → gear next to the domain → DNS → ADD RECORD</strong> and pick each
+          Type (MX / SRV / TXT / CNAME) in turn. CNAME is reached via <strong>Manage Subdomains →
+          gear on the subdomain → DNS</strong> instead.</li>
+        <li>Confirm three things:
+          <ul>
+            <li>The exact field labels in the add form (the SRV form screenshot shows
+              <code>Type / Service / Protocol / Host name / Points to / Priority / Weight / Port</code>;
+              check MX/TXT match <code>Host name / Points to / Value</code> and CNAME uses
+              <code>Hostname / Point to</code>).</li>
+            <li><strong>Apex Host name</strong> is entered as <code>@</code> (what we ship) for MX/TXT, not left blank.</li>
+            <li>Whether the SRV <strong>Protocol</strong> dropdown offer matches <code>TCP</code> and whether any target
+              needs a trailing dot (the CNAME doc says enter it without one).</li>
+          </ul>
+        </li>
+        <li>Fix <code>records.json</code> if anything differs, then remove the <code>UNVERIFIED —</code> prefixes
+          from the four <code>ionos</code> headers, and delete the unverified notes in
+          <a href="https://github.com/thunderbird/dns-scripts/blob/main/README.md"><code>README.md</code></a> and the <code>ionos</code> section below.</li>
+      </ol>
+      <p><code>clayzahrobsky.com</code> is already correctly configured on IONOS, so it is a ready-made
+      target: <code>verify_thundermail_dns.py clayzahrobsky.com</code> should report 13/13.</p>
+      <p>Details and reasoning are in the <a href="#ionos-ionoscom--unverified"><code>ionos</code> notes</a>.</p>
+
+      <p><strong><code>ovh</code> is unverified.</strong> To promote it (do this when you have a live OVHcloud panel
+      open):</p>
+      <ol>
+        <li>Open <strong>Web Cloud → DNS zones → your domain → DNS zone → Add an entry</strong> and pick each
+          type (MX / SRV / TXT / CNAME) in turn.</li>
+        <li>Confirm three things:
+          <ul>
+            <li>The exact field labels in each wizard (the TXT/SPF wizard screenshot shows
+              <code>Sub-domain / TTL / Value</code>; the <strong>MX</strong> and <strong>SRV</strong> wizards were <strong>not</strong>
+              screenshotted — verify their labels and, for SRV, whether Priority/Weight/Port/Target
+              are separate fields or one combined string).</li>
+            <li><strong>Apex Sub-domain</strong> is left <strong>empty</strong> (what we ship), not <code>@</code>.</li>
+            <li>Whether <strong>MX and SRV targets need a trailing dot</strong> (we ship one on all FQDN
+              targets, since the docs say OVH appends your domain to an unpunctuated target;
+              the CNAME trailing dot is documented, MX/SRV is inferred).</li>
+          </ul>
+        </li>
+        <li>Fix <code>records.json</code> if anything differs, then remove the <code>UNVERIFIED —</code> prefixes
+          from the four <code>ovh</code> headers, and delete the unverified notes in
+          <a href="https://github.com/thunderbird/dns-scripts/blob/main/README.md"><code>README.md</code></a> and the <code>ovh</code> section below.</li>
+      </ol>
+      <p><code>vntc.it</code> is already correctly configured on OVH (NS <code>ns200.anycast.me</code>), so it is a
+      ready-made target: <code>verify_thundermail_dns.py vntc.it</code> should report 13/13, and
+      <code>--resolver ns200.anycast.me</code> queries OVH authoritatively.</p>
+      <p>Details and reasoning are in the <a href="#ovh-ovhcloudcom--unverified"><code>ovh</code> notes</a>.</p>
+    </details>
+
+    <details>
+      <summary><h2>Notes</h2></summary>
+
+      <h3 id="bunny-bunnynet"><code>bunny</code> (bunny.net)</h3>
+      <p>Added 2026-07-13. First drafted from a record-list screenshot (the <code>soylent.red</code>
+      zone), then <strong>corrected and verified</strong> the same day against bunny.net's official
+      docs (<a href="https://docs.bunny.net/docs/dns-records">DNS records</a>). The confirmed
+      conventions:</p>
+      <ul>
+        <li>The add-record dialog is a <strong>single form</strong> with a <strong>Type</strong> dropdown (not per-type
+          sections like Cosmotown) and fields <strong>Hostname / Type / TTL / Value</strong>.</li>
+        <li><strong>Hostname</strong> is left <strong>empty for the root domain</strong> (the <code>subhost</code> pattern) — never
+          <code>@</code>; bunny lists apex records under the full domain name.</li>
+        <li>There is <strong>one Value field with no separate Priority / Weight / Port fields</strong>, so
+          MX and SRV put the whole record string in Value (<code>{match}</code>) — e.g. MX
+          <code>10 mail.thundermail.com</code>, SRV <code>0 1 443 mail.thundermail.com</code>. The record-list
+          screenshot corroborated this (MX displayed as <code>10 mail.thundermail.com</code>).</li>
+        <li>The record list's <strong>Weight</strong> column is bunny's A/AAAA load-balancing "Routing
+          Weight" (0-100, under Advanced Settings), <strong>not</strong> the SRV weight — so it does not
+          factor into any of the Thundermail records.</li>
+      </ul>
+      <p>Corrections made from the initial screenshot-only draft: the field is <strong>Hostname</strong>
+      (not "Name"); MX/SRV use a single <strong>Value</strong> (not separate Priority/Weight/Port);
+      dropped the unverified CNAME "no trailing dot" note.</p>
+      <p><strong>Live validation (2026-07-13):</strong> ran the CLI against the real bunny.net-hosted
+      <code>soylent.red</code> (delegated to <code>kiki</code>/<code>coco.bunny.net</code>) → <strong>13/13 passed, exit 0</strong>.
+      Driven by Zendesk ticket <a href="https://tbpro.zendesk.com/agent/tickets/6750">6750</a>.
+      Every value bunny.net serves matches the expected strings byte-for-byte, including
+      <code>MX 10 mail.thundermail.com</code> and <code>SRV 0 1 443 mail.thundermail.com</code> — confirming the
+      single-<code>Value</code>-field (<code>{match}</code>) remediation produces exactly what the panel stores.</p>
+
+      <h3 id="spaceship-spaceshipcom--unverified"><code>spaceship</code> (spaceship.com) — unverified</h3>
+      <p>Added 2026-07-13 for Zendesk ticket
+      <a href="https://tbpro.zendesk.com/agent/tickets/6672">6672</a>. Marked <strong>unverified</strong> because
+      the two sources only partly cover it:</p>
+      <ul>
+        <li>A <strong>zone-import preview</strong> screenshot from the real <code>dexterica.com</code> zone
+          (CONTRIBUTING artifact type 2, and specifically the <em>import</em> view — not the
+          higher-priority manual add-record form, type 1).</li>
+        <li>Spaceship's official docs
+          (<a href="https://www.spaceship.com/knowledgebase/spacemail-dns-records-third-party-domain/">Required DNS records for Spacemail</a>),
+          which document <strong>Spacemail's own</strong> records (<code>mx1.spacemail.com</code>, …), a <em>different</em>
+          record set — so they confirm the panel's column labels but not the Thundermail entries.</li>
+      </ul>
+      <p>What the sources agree on and we encoded:</p>
+      <ul>
+        <li>Columns are <strong>Host / Type / Value / TTL</strong> (docs call Host "Hostname"); the panel
+          auto-appends the domain to Host and uses <strong><code>@</code> for the root</strong> (not blank).</li>
+        <li><strong>MX</strong> has a separate <strong>Priority</strong> field alongside the target Value.</li>
+        <li><strong>SRV</strong> breaks out <strong>Priority / Weight / Port / Target</strong> as separate fields.</li>
+        <li>The provider headers themselves carry an <code>UNVERIFIED</code> prefix so CLI/web users see
+          the caveat inline.</li>
+      </ul>
+      <p>Still <strong>unverified</strong> against a live manual add-record form:</p>
+      <ul>
+        <li>Exact field labels in the <em>add</em> form (vs. the import preview).</li>
+        <li>Whether CNAME/MX targets need a trailing dot (the import view showed them stored
+          with one).</li>
+      </ul>
+      <p><strong>SRV host — resolved 2026-07-14.</strong> The import view split the SRV host into
+      <code>_caldavs</code> + <code>_tcp</code> (service + protocol) fields, which cast doubt on the combined
+      <code>_caldavs._tcp</code> we ship. Reading Spaceship's public API DNS model settles it: the API
+      represents an SRV record with a <strong>single combined <code>name</code></strong> (e.g. <code>_caldavs._tcp</code>) plus
+      separate <code>priority</code> / <code>weight</code> / <code>port</code>, with <strong>no split service/protocol</strong> — confirmed
+      against <a href="https://docs.spaceship.dev/">docs.spaceship.dev</a> and the <code>dns.ts</code> schema in the
+      community MCP server <a href="https://github.com/hlebtkachenko/spaceship-mcp"><code>hlebtkachenko/spaceship-mcp</code></a>
+      (generic <code>name</code> / value / <code>priority</code> / <code>weight</code> / <code>port</code> per record). So the combined
+      <code>_caldavs._tcp</code> is correct at the data level and the split was a display quirk of the
+      <em>import</em> view. (Contrast <code>godaddy</code>, whose <em>manual add form</em> genuinely splits Service and
+      Protocol into separate inputs — a UI-layout difference, not a difference in the stored
+      record.)</p>
+      <p>A community Spaceship <strong>MCP server</strong> (wraps the REST API; auth via
+      <code>SPACESHIP_API_KEY</code> / <code>SPACESHIP_API_SECRET</code>) can drive a <em>functional</em> verification —
+      create the 13 Thundermail records via its <code>ss_dns_save</code> tool on a live Spaceship-hosted
+      domain, then <code>verify_thundermail_dns.py &lt;domain&gt; --resolver &lt;Spaceship NS&gt; --provider
+      spaceship</code> should report 13/13 (same approach that validated <code>bunny</code> against
+      <code>soylent.red</code>). That would confirm the record <strong>values</strong> and the combined-<code>name</code>
+      decision, but the API is a different surface than the manual web form, so it still
+      wouldn't nail the form's field <strong>labels</strong> (item 1) or the trailing-dot UI behavior
+      (item 3) — a screenshot of the live add form remains the way to fully promote.</p>
+      <p>To promote to verified: capture the manual add-record form for one record of each
+      type, confirm the field sets, then drop the <code>UNVERIFIED</code> prefixes in <code>records.json</code>
+      and the note here and in <a href="https://github.com/thunderbird/dns-scripts/blob/main/README.md"><code>README.md</code></a>.</p>
+
+      <h3 id="godaddy-godaddycom--unverified"><code>godaddy</code> (godaddy.com) — unverified</h3>
+      <p>Added 2026-07-14 for internal ticket 6850 (<code>6850_GODADDY_CUSTOM_DOMAIN</code>). Marked
+      <strong>unverified</strong>: the conventions come from GoDaddy's official help articles plus a
+      screenshot of the live <strong>SRV</strong> add-record form, but haven't been confirmed end-to-end
+      by adding all 13 records on a live GoDaddy-hosted domain. Sources:
+      <a href="https://www.godaddy.com/en-ca/help/add-an-mx-record-19234">MX</a>,
+      <a href="https://www.godaddy.com/en-ca/help/add-a-txt-record-19232">TXT</a>,
+      <a href="https://www.godaddy.com/en-ca/help/add-an-spf-record-19218">SPF</a>,
+      <a href="https://www.godaddy.com/en-ca/help/add-a-cname-record-19236">CNAME</a>,
+      <a href="https://www.godaddy.com/en-ca/help/add-an-srv-record-19216">SRV</a>.</p>
+      <p>What the docs + screenshot establish and we encoded:</p>
+      <ul>
+        <li>The add-record dialog is a <strong>single form</strong> with a <strong>Type</strong> dropdown (like <code>bunny</code>
+          / <code>spaceship</code>, not per-type sections like Cosmotown). Path: <strong>Domain Portfolio →
+          domain → DNS → DNS Records → Add New Record</strong>.</li>
+        <li><strong>Name</strong> is entered as <strong><code>@</code> for the root domain</strong> (GoDaddy uses <code>@</code>, not a blank
+          field — the <code>{host}</code> pattern, unlike bunny/cosmotown's blank apex).</li>
+        <li><strong>MX</strong> has a separate <strong>Priority</strong> field; <strong>Value</strong> is the mail host alone.</li>
+        <li><strong>SRV</strong> is the most decomposed of any provider: the form breaks the
+          <code>_service._protocol</code> label into separate <strong>Service</strong> (<code>_jmap</code>) and <strong>Protocol</strong>
+          (<code>_tcp</code>) fields, plus <strong>Name</strong> (<code>@</code> at the apex), <strong>Value</strong> (target), and separate
+          <strong>Priority / Weight / Port</strong>. This is the first provider to need it, so it added
+          <code>{service}</code> / <code>{protocol}</code> / <code>{srvhost}</code> tokens to the shared interpreter in
+          <strong>both</strong> <code>verify_thundermail_dns.py</code> and <code>app.js</code> (derived by splitting the SRV
+          host label on <code>.</code>; kept in sync per CLAUDE.md).</li>
+        <li><strong>SPF</strong> is added as a plain <strong>TXT</strong> record (GoDaddy's SPF help article is just a
+          TXT with an SPF value), so it uses the TXT field set.</li>
+        <li>The provider headers carry an <code>UNVERIFIED —</code> prefix so CLI/web users see the
+          caveat inline.</li>
+      </ul>
+      <p>Still <strong>unverified</strong> against a live end-to-end add: the exact MX/TXT/CNAME field
+      labels (only the SRV form was screenshotted), and whether any target Value needs a
+      trailing dot. To promote: add one record of each type on a live GoDaddy-hosted
+      domain, confirm 13/13 via <code>--resolver &lt;the domain's GoDaddy authoritative NS&gt;</code>, then
+      drop the <code>UNVERIFIED</code> prefixes in <code>records.json</code> and the notes here and in
+      <a href="https://github.com/thunderbird/dns-scripts/blob/main/README.md"><code>README.md</code></a>.</p>
+
+      <h3 id="ionos-ionoscom--unverified"><code>ionos</code> (ionos.com) — unverified</h3>
+      <p>Added 2026-07-16 for internal ticket 6911 (<code>6911_IONOS_DNS_CLAYZAHROBSKY_DOT_COM</code>,
+      domain <code>clayzahrobsky.com</code>). Marked <strong>unverified</strong>: the conventions come from six IONOS
+      help articles plus a screenshot of the live <strong>SRV</strong> add-record form, but haven't been
+      confirmed end-to-end by adding all 13 records on a live IONOS-hosted domain. Sources
+      (IONOS Help): <em>Using a Domain with Another Provider's Mail Servers (Editing MX
+      Records)</em>, <em>Managing TXT Records</em>, <em>Managing SRV Records</em>, <em>Configuring a DMARC Record
+      for a Domain</em>, <em>Configuring a CNAME Record for a Subdomain</em>, <em>Using IONOS SPF to
+      Improve Email Delivery</em>.</p>
+      <p>What the docs + screenshot establish and we encoded:</p>
+      <ul>
+        <li>The add-record dialog is a <strong>single form</strong> with a <strong>Type</strong> dropdown (like <code>godaddy</code>
+          / <code>bunny</code> / <code>spaceship</code>, not per-type sections like Cosmotown). Path: <strong>Domains &amp; SSL
+          → gear next to the domain → DNS → ADD RECORD</strong>.</li>
+        <li><strong>Host name</strong> is entered as <strong><code>@</code> for the root domain</strong> for MX/TXT (the <code>{host}</code>
+          pattern, not blank like bunny/cosmotown).</li>
+        <li><strong>MX</strong> has a separate <strong>Priority</strong> field; <strong>Points to</strong> is the mail host alone.</li>
+        <li><strong>SRV</strong> is decomposed like GoDaddy — the form splits <code>_service._protocol</code> into
+          <strong>Service</strong> (<code>_jmap</code>) and <strong>Protocol</strong> fields — but with two IONOS-specific twists:
+          (1) <strong>Protocol is a <code>TCP</code>/<code>UDP</code>/<code>TLS</code> dropdown</strong>, so <code>{protocol}</code> (which yields
+          <code>_tcp</code>) would not match an option; it is <strong>hard-coded to <code>TCP</code></strong> because all five
+          checked SRV records are <code>_tcp</code>. (2) The form has both a <strong>Host name</strong> (record
+          location → <code>{srvhost}</code>, <code>@</code> at the apex) and a separate <strong>Points to</strong> (target),
+          one field more than GoDaddy's SRV form. This reuses the <code>{service}</code> / <code>{srvhost}</code>
+          tokens already added for <code>godaddy</code>, so no interpreter change was needed.</li>
+        <li><strong>SPF</strong> is a plain <strong>TXT</strong> record. IONOS enables its own "IONOS SPF" by default and
+          may already have added a TXT (<code>v=spf1 include:_spf-us.ionos.com ~all</code>); the TXT
+          header notes that the user must replace/merge it so only one SPF record remains.</li>
+        <li><strong>CNAME</strong> is reached via <strong>Manage Subdomains → gear on the subdomain → DNS</strong> (not the
+          main DNS tab), and its fields are labelled <strong>Hostname</strong> / <strong>Point to</strong> (vs
+          <strong>Host name</strong> / <strong>Points to</strong> elsewhere); the target is entered without a trailing dot.</li>
+        <li>The provider headers carry an <code>UNVERIFIED —</code> prefix so CLI/web users see the caveat
+          inline.</li>
+      </ul>
+      <p>Still <strong>unverified</strong> against a live end-to-end add: the exact MX/TXT/CNAME field labels
+      (only the SRV form was screenshotted), the SRV Protocol dropdown values, and whether any
+      target needs a trailing dot. To promote: <code>clayzahrobsky.com</code> is already correctly
+      configured on IONOS, so confirm 13/13 with <code>verify_thundermail_dns.py clayzahrobsky.com</code>,
+      eyeball the emitted <code>ionos</code> fix strings against the live panel, then drop the
+      <code>UNVERIFIED</code> prefixes in <code>records.json</code> and the notes here and in
+      <a href="https://github.com/thunderbird/dns-scripts/blob/main/README.md"><code>README.md</code></a>.</p>
+
+      <h3 id="ovh-ovhcloudcom--unverified"><code>ovh</code> (ovhcloud.com) — unverified</h3>
+      <p>Added 2026-07-16 for internal ticket 6837 (<code>6837_OVH_DNS_PROVIDER_vntc.t</code>, sample domain
+      <code>vntc.it</code>). Marked <strong>unverified</strong>: the conventions come from three OVHcloud help articles
+      plus a screenshot of the live <strong>TXT/SPF</strong> add-entry wizard, but the <strong>MX</strong> and <strong>SRV</strong>
+      wizard field layouts were not screenshotted and haven't been confirmed end-to-end. Sources
+      (OVHcloud Documentation): <em>Editing an OVHcloud DNS zone</em>
+      (docs.ovhcloud.com/en/guides/web-cloud/domains/dns-zone-edit), <em>Everything you need to know
+      about DNS zone</em>, <em>How to improve email security with an SPF record</em>
+      (docs.ovhcloud.com/en/guides/web-cloud/domains/dns-zone-spf).</p>
+      <p>What the docs + screenshot establish and we encoded:</p>
+      <ul>
+        <li>Records are added through a <strong>3-step "Add an entry to the DNS zone" wizard</strong> reached from
+          the DNS zone table (<strong>Web Cloud → DNS zones → domain → DNS zone → Add an entry</strong>), not a
+          flat single form. Step 1 picks the type (A/AAAA/NS/CNAME; CAA/TXT/NAPTR/SRV/…;
+          MX/SPF/DKIM/DMARC).</li>
+        <li><strong>Apex Sub-domain is left empty</strong> — the wizard shows the <code>.yourdomain</code> suffix beside the
+          field and appends it automatically (the <code>{subhost}</code> pattern, like bunny/cosmotown, not
+          <code>@</code>).</li>
+        <li>⚠️ <strong>FQDN targets need a trailing dot.</strong> The docs are explicit for CNAME/URL targets ("if
+          you do not punctuate it, your domain name will be automatically added to the end"), so all
+          <code>ovh</code> MX/SRV/CNAME targets are emitted with a trailing <code>.</code> (encoded as <code>{target}.</code>). OVH
+          is the first provider to require this. The CNAME dot is documented; the MX/SRV dot is
+          inferred from the same rule and still needs live confirmation.</li>
+        <li><strong>SRV keeps the <code>_service._protocol</code> label combined</strong> in Sub-domain (<code>{host}</code>, e.g.
+          <code>_jmap._tcp</code>) — OVH does <strong>not</strong> split Service/Protocol like <code>godaddy</code>/<code>ionos</code>, so the
+          existing tokens suffice and <strong>no interpreter change was needed</strong>.</li>
+        <li><strong>SPF</strong> uses the plain <strong>TXT</strong> path; the header steers users away from OVH's "Add an
+          OVHcloud SPF record" button (which injects <code>include:mx.ovh.com</code>).</li>
+        <li>The provider headers carry an <code>UNVERIFIED —</code> prefix so CLI/web users see the caveat
+          inline.</li>
+      </ul>
+      <p>Still <strong>unverified</strong> against a live end-to-end add: the exact <strong>MX</strong> and <strong>SRV</strong> wizard
+      field labels (only the TXT/SPF wizard was screenshotted), whether the SRV wizard uses
+      separate Priority/Weight/Port/Target fields, and whether MX/SRV targets truly need the
+      trailing dot. To promote: <code>vntc.it</code> is already correctly configured on OVH, so confirm 13/13
+      with <code>verify_thundermail_dns.py vntc.it</code> (or <code>--resolver ns200.anycast.me</code>), eyeball the
+      emitted <code>ovh</code> fix strings against the live panel, then drop the <code>UNVERIFIED</code> prefixes in
+      <code>records.json</code> and the notes here and in
+      <a href="https://github.com/thunderbird/dns-scripts/blob/main/README.md"><code>README.md</code></a>.</p>
+    </details>
+  </main>
+</body>
+</html>
