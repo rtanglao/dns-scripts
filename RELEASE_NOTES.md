@@ -6,7 +6,22 @@ provider is pure data in [`records.json`](records.json); both front-ends (the
 automatically. See [`CONTRIBUTING.md`](CONTRIBUTING.md) for the onboarding workflow
 and the verification bar every provider is held to.
 
-## ⚠️ Pending verification
+## Providers
+
+| Provider      | Added      | Verification                                                                 |
+| ------------- | ---------- | ---------------------------------------------------------------------------- |
+| `namecheap`   | 2026-07-02 | Field conventions verified against Namecheap's docs.                         |
+| `squarespace` | 2026-07-02 | Field conventions verified against Squarespace's docs.                       |
+| `generic`     | 2026-07-02 | Provider-agnostic FQDN/value fallback — nothing panel-specific to verify.    |
+| `cosmotown`   | 2026-07-07 | Verified against a live panel (dexterica.com); quirks confirmed from a record-list screenshot. |
+| `bunny`       | 2026-07-13 | Verified against bunny.net's official docs (docs.bunny.net/docs/dns-records). |
+| `spaceship`   | 2026-07-13 | **Unverified.** Inferred from a zone-import screenshot + Spaceship's Spacemail docs. |
+| `godaddy`     | 2026-07-14 | **Unverified.** From GoDaddy's help docs + a live SRV add-form screenshot; not confirmed end-to-end. |
+| `ionos`       | 2026-07-16 | **Unverified.** From IONOS's help docs + a live SRV add-form screenshot; not confirmed end-to-end. |
+| `ovh`         | 2026-07-16 | **Unverified.** From OVHcloud's help docs + a live TXT/SPF wizard screenshot; MX/SRV wizards not screenshotted. |
+
+<details>
+<summary><h2>⚠️ Pending verification</h2></summary>
 
 **`spaceship` is unverified.** To promote it (do this when you have a live Spaceship
 panel open):
@@ -90,21 +105,10 @@ ready-made target: `verify_thundermail_dns.py vntc.it` should report 13/13, and
 
 Details and reasoning are in the [`ovh` notes](#ovh-ovhcloudcom--unverified).
 
-## Providers
+</details>
 
-| Provider      | Added      | Verification                                                                 |
-| ------------- | ---------- | ---------------------------------------------------------------------------- |
-| `namecheap`   | 2026-07-02 | Field conventions verified against Namecheap's docs.                         |
-| `squarespace` | 2026-07-02 | Field conventions verified against Squarespace's docs.                       |
-| `generic`     | 2026-07-02 | Provider-agnostic FQDN/value fallback — nothing panel-specific to verify.    |
-| `cosmotown`   | 2026-07-07 | Verified against a live panel (dexterica.com); quirks confirmed from a record-list screenshot. |
-| `bunny`       | 2026-07-13 | Verified against bunny.net's official docs (docs.bunny.net/docs/dns-records). |
-| `spaceship`   | 2026-07-13 | **Unverified.** Inferred from a zone-import screenshot + Spaceship's Spacemail docs. |
-| `godaddy`     | 2026-07-14 | **Unverified.** From GoDaddy's help docs + a live SRV add-form screenshot; not confirmed end-to-end. |
-| `ionos`       | 2026-07-16 | **Unverified.** From IONOS's help docs + a live SRV add-form screenshot; not confirmed end-to-end. |
-| `ovh`         | 2026-07-16 | **Unverified.** From OVHcloud's help docs + a live TXT/SPF wizard screenshot; MX/SRV wizards not screenshotted. |
-
-## Notes
+<details>
+<summary><h2>Notes</h2></summary>
 
 ### `bunny` (bunny.net)
 
@@ -316,3 +320,5 @@ trailing dot. To promote: `vntc.it` is already correctly configured on OVH, so c
 with `verify_thundermail_dns.py vntc.it` (or `--resolver ns200.anycast.me`), eyeball the
 emitted `ovh` fix strings against the live panel, then drop the `UNVERIFIED` prefixes in
 `records.json` and the notes here and in [`README.md`](README.md).
+
+</details>
