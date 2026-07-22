@@ -1,0 +1,21 @@
+{
+  "_comment": "Shared fixtures exercised by BOTH the Python suite (tests/test_parity.py) and the Node harness (tests/parity/run_js.mjs). JSON has no comment syntax, so this key documents intent. matchCases feed matches(); resolveCases feed resolve_record/resolveRecord + value_of/valueOf.",
+  "matchCases": [
+    {"name": "exact rejects appended target (#10)", "expected": "0 1 443 mail.thundermail.com", "answers": ["0 1 443 mail.thundermail.com.emilio.me"], "mode": "exact", "verdict": false},
+    {"name": "exact accepts correct target", "expected": "0 1 443 mail.thundermail.com", "answers": ["0 1 443 mail.thundermail.com"], "mode": "exact", "verdict": true},
+    {"name": "exact accepts among multiple answers", "expected": "10 mail.thundermail.com", "answers": ["20 backup.example.com", "10 mail.thundermail.com"], "mode": "exact", "verdict": true},
+    {"name": "exact is case-insensitive", "expected": "tm1.example.com.dkim.thunderhosted.com", "answers": ["TM1.EXAMPLE.COM.DKIM.THUNDERHOSTED.COM"], "mode": "exact", "verdict": true},
+    {"name": "exact rejects empty answers", "expected": "10 mail.thundermail.com", "answers": [], "mode": "exact", "verdict": false},
+    {"name": "contains accepts prefix fragment", "expected": "v=STSv1;", "answers": ["v=STSv1; id=18139500144460329770"], "mode": "contains", "verdict": true},
+    {"name": "contains rejects absent fragment", "expected": "v=STSv1;", "answers": ["v=spf1 include:spf.thundermail.com -all"], "mode": "contains", "verdict": false},
+    {"name": "contains matches full SPF value", "expected": "v=spf1 include:spf.thundermail.com -all", "answers": ["v=spf1 include:spf.thundermail.com -all"], "mode": "contains", "verdict": true}
+  ],
+  "resolveCases": [
+    {"name": "MX apex", "domain": "example.com", "record": {"type": "MX", "host": "@", "priority": 10, "target": "mail.thundermail.com"}},
+    {"name": "SRV apex", "domain": "example.com", "record": {"type": "SRV", "host": "_jmap._tcp", "priority": 0, "weight": 1, "port": 443, "target": "mail.thundermail.com"}},
+    {"name": "TXT apex SPF", "domain": "example.com", "record": {"type": "TXT", "host": "@", "label": "@ (SPF)", "value": "v=spf1 include:spf.thundermail.com -all", "match": "v=spf1 include:spf.thundermail.com -all"}},
+    {"name": "TXT TLSRPT with {domain} token", "domain": "example.com", "record": {"type": "TXT", "host": "_smtp._tls", "value": "v=TLSRPTv1; rua=mailto:postmaster@{domain}", "match": "v=TLSRPTv1;"}},
+    {"name": "CNAME DKIM subdomain with {domain} token", "domain": "example.com", "record": {"type": "CNAME", "host": "tm1._domainkey", "target": "tm1.{domain}.dkim.thunderhosted.com"}},
+    {"name": "SRV non-apex (exercises srvhost/srvsubhost rest label)", "domain": "example.com", "record": {"type": "SRV", "host": "_sip._tcp.pbx", "priority": 5, "weight": 10, "port": 5060, "target": "sip.example.net"}}
+  ]
+}

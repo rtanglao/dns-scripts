@@ -174,6 +174,18 @@ Exit status is `0` only when all 13 records are present and correct.
 
 ## Testing
 
+- **Automated suite (`tests/`, stdlib `unittest`, no network):** run with
+  `uv run python -m unittest discover -s tests -t . -v` (also runs in CI via
+  `.github/workflows/test.yml` on push/PR). `test_verify.py` covers the pure
+  interpreter (matching incl. the #10 exact-vs-contains regression, token
+  resolution, provider rendering) and lints `records.json` (every provider covers
+  all four types; every field template interpolates with no unknown/leftover
+  token; each `value_templates.<TYPE>` has a valid `match_mode`). `test_parity.py`
+  enforces the **Python↔JS sync rule**: it runs `tests/fixtures/parity_cases.json`
+  through both the Python functions and a Node harness (`tests/parity/run_js.mjs`,
+  which loads `app.js` in a `vm` sandbox) and asserts identical results — so when
+  you change the interpreter in one language, update the other or this test fails.
+  Add a fixture case whenever you add an interpreter token or `match_mode`.
 - **CLI regression:** normal-input output should stay byte-identical across
   refactors. Capture `glamrocnamecheap.com` (expect 13/13, exit 0) and
   `example.com --provider namecheap|squarespace|cosmotown|generic` before a change, then
