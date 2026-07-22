@@ -17,10 +17,10 @@
   ],
   "group_headers": {"MX": "MX:", "SRV": "SRV:", "TXT": "TXT:", "CNAME": "CNAME (DKIM):"},
   "value_templates": {
-    "MX": {"match": "{priority} {target}", "value": "{target}"},
-    "SRV": {"match": "{priority} {weight} {port} {target}", "value": "{weight} {port} {target}"},
-    "TXT": {"match": "{match}", "value": "{value}"},
-    "CNAME": {"match": "{target}", "value": "{target}"}
+    "MX": {"match": "{priority} {target}", "value": "{target}", "match_mode": "exact"},
+    "SRV": {"match": "{priority} {weight} {port} {target}", "value": "{weight} {port} {target}", "match_mode": "exact"},
+    "TXT": {"match": "{match}", "value": "{value}", "match_mode": "contains"},
+    "CNAME": {"match": "{target}", "value": "{target}", "match_mode": "exact"}
   },
   "providers": {
     "namecheap": {

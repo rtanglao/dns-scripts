@@ -118,6 +118,18 @@ def value_of(ctx: dict, cfg: dict, key: str) -> str:
     return interpolate(cfg["value_templates"][ctx["type"]][key], ctx)
 
 
+def matches(expected: str, answers: list[str], mode: str) -> bool:
+    """True if `expected` matches any answer. mode 'exact' (MX/SRV/CNAME) requires
+    a whole-record equality so a target with extra labels appended (e.g. a missing
+    trailing dot turning `mail.thundermail.com` into `mail.thundermail.com.example.com`)
+    fails; mode 'contains' (TXT) keeps the substring test the prefix fragments
+    (MTA-STS/TLSRPT/DMARC) rely on. Case-insensitive; kept in sync with app.js."""
+    exp = expected.lower()
+    if mode == "exact":
+        return any(exp == a.lower() for a in answers)
+    return any(exp in a.lower() for a in answers)
+
+
 def render_fix(cfg: dict, provider: str, ctx: dict) -> list[str]:
     """Long form: provider instructions for one record (header + labelled fields)."""
     block = cfg["providers"][provider][ctx["type"]]
@@ -216,13 +228,16 @@ def main() -> int:
         # reference {match} / {value} uniformly across record types.
         expected = ctx["match"] = value_of(ctx, cfg, "match")
         ctx["value"] = value_of(ctx, cfg, "value")
-        actual = " / ".join(query(resolver, ctx["qname"], rec["type"]))
-        shown = cap(actual)  # match on the full answer; display a bounded slice
-        if expected.lower() in actual.lower():
+        answers = query(resolver, ctx["qname"], rec["type"])
+        actual = " / ".join(answers)
+        shown = cap(actual)  # match per-answer; display a bounded slice of the join
+        mode = cfg["value_templates"][rec["type"]].get("match_mode", "contains")
+        if matches(expected, answers, mode):
             print(f"  {GREEN}OK{RESET}   {label(rec):<46} {shown}")
             passed += 1
         else:
-            print(f"  {RED}FAIL{RESET} {label(rec):<46} expected to contain: {expected}")
+            verb = "expected" if mode == "exact" else "expected to contain"
+            print(f"  {RED}FAIL{RESET} {label(rec):<46} {verb}: {expected}")
             print(f"       {'':<46} got: {shown or '<empty>'}")
             failures.append(ctx)
 

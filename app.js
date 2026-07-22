@@ -70,6 +70,18 @@ function valueOf(ctx, cfg, key) {
   return interpolate(cfg.value_templates[ctx.type][key], ctx);
 }
 
+// True if `expected` matches any answer. mode "exact" (MX/SRV/CNAME) requires a
+// whole-record equality so a target with extra labels appended (e.g. a missing
+// trailing dot turning "mail.thundermail.com" into "mail.thundermail.com.example.com")
+// fails; mode "contains" (TXT) keeps the substring test the prefix fragments
+// (MTA-STS/TLSRPT/DMARC) rely on. Case-insensitive; kept in sync with the CLI.
+function matches(expected, answers, mode) {
+  const exp = expected.toLowerCase();
+  return mode === "exact"
+    ? answers.some((a) => a.toLowerCase() === exp)
+    : answers.some((a) => a.toLowerCase().includes(exp));
+}
+
 function renderFix(cfg, provider, ctx) {
   // Long form: header + labelled fields for a single record.
   const block = cfg.providers[provider][ctx.type];
@@ -216,14 +228,18 @@ async function runCheck(evt) {
       ctx.value = valueOf(ctx, CFG, "value");
       const expected = ctx.match;
 
+      let answers = [];
       let actual = "";
       try {
-        actual = (await query(resolver, ctx.qname, rec.type)).join(" / ");
+        answers = await query(resolver, ctx.qname, rec.type);
+        actual = answers.join(" / ");
       } catch (e) {
         actual = `(lookup error: ${e.message})`;
       }
 
-      const ok = actual.toLowerCase().includes(expected.toLowerCase());
+      const mode = CFG.value_templates[rec.type].match_mode ?? "contains";
+      const ok = matches(expected, answers, mode);
+      const verb = mode === "exact" ? "expected" : "expected to contain";
       const row = el("div", "row");
       row.appendChild(el("span", `badge ${ok ? "ok" : "fail"}`, ok ? "OK" : "FAIL"));
       row.appendChild(el("span", "rlabel", labelOf(rec)));
@@ -232,7 +248,7 @@ async function runCheck(evt) {
         passed++;
       } else {
         row.appendChild(el("span", "rval miss",
-          `expected: ${expected}  —  got: ${cap(actual) || "(nothing)"}`));
+          `${verb}: ${expected}  —  got: ${cap(actual) || "(nothing)"}`));
         failures.push(ctx);
       }
       groupEl.appendChild(row);
