@@ -78,7 +78,7 @@ uv run verify_thundermail_dns.py <domain> --resolver kiki.bunny.net
 Pass `--provider` to print, for each **failing** record, exactly what to enter in
 that DNS provider's control panel — including provider-specific quirks such as how
 the Host/Name field is written. Supported: `namecheap`, `squarespace`, `cosmotown`,
-`bunny`, `spaceship`, `godaddy`, `ionos`, `ovh`, `hover`, `generic`. bunny.net's add-record form has a single
+`bunny`, `spaceship`, `godaddy`, `ionos`, `ovh`, `hover`, `digitalocean`, `generic`. bunny.net's add-record form has a single
 **Value** field (no separate Priority/Weight/Port), so the `bunny` MX/SRV output puts
 the whole record string in Value; the Hostname field is left empty for the root
 ([bunny.net: DNS records](https://docs.bunny.net/docs/dns-records)). **`spaceship`
@@ -109,7 +109,16 @@ the live *Edit DNS Record* form, but the MX/TXT/CNAME field labels come from Hov
 `_service._protocol` label into separate **Service** and **Protocol** fields (like GoDaddy/IONOS),
 but its optional **Subdomain** field is left **empty** for the root (not `@` — the `hover`
 SRV output uses a blank subdomain, driven by a `{srvsubhost}` token); MX/TXT use `@` for the
-root. Note that
+root. **`digitalocean` is also unverified** — its SRV field layout comes from a screenshot
+of the live *Create a record* dialog, while the MX/TXT/CNAME field labels come from
+DigitalOcean's [Create, Edit, and Delete DNS Records](https://docs.digitalocean.com/products/networking/dns/how-to/manage-records/)
+docs (not a live add-record screenshot), so its headers flag this. DigitalOcean keeps the
+whole SRV `_service._protocol` label in one **Hostname** field (it does *not* split it like
+GoDaddy/IONOS/Hover), uses `@` for the root (MX/TXT), and **appends your domain to any
+target entered without a trailing dot** — so the `digitalocean` MX/SRV/CNAME output ends
+targets with a `.` (like `ovh`). This trailing-dot behaviour is confirmed live on
+`emilio.me`, whose SRV targets were entered without the dot and came back as
+`mail.thundermail.com.emilio.me`. Note that
 Cosmotown's customer panel has no SRV section, so the five SRV
 records can't be self-served — the `cosmotown` output routes you to Cosmotown support
 for those. See Cosmotown's docs for

@@ -19,6 +19,8 @@ and the verification bar every provider is held to.
 | `godaddy`     | 2026-07-14 | **Unverified.** From GoDaddy's help docs + a live SRV add-form screenshot; not confirmed end-to-end. |
 | `ionos`       | 2026-07-16 | **Unverified.** From IONOS's help docs + a live SRV add-form screenshot; not confirmed end-to-end. |
 | `ovh`         | 2026-07-16 | **Unverified.** From OVHcloud's help docs + a live TXT/SPF wizard screenshot; MX/SRV wizards not screenshotted. |
+| `hover`       | 2026-07-20 | **Unverified.** From Hover's help docs + a live SRV Edit-DNS-Record screenshot; MX/TXT/CNAME not screenshotted. |
+| `digitalocean`| 2026-07-21 | **Unverified.** From DigitalOcean's help docs + a live SRV Create-a-record screenshot; trailing-dot rule confirmed live on emilio.me. |
 
 <details>
 <summary><h2>⚠️ Pending verification</h2></summary>
@@ -104,6 +106,30 @@ ready-made target: `verify_thundermail_dns.py vntc.it` should report 13/13, and
 `--resolver ns200.anycast.me` queries OVH authoritatively.
 
 Details and reasoning are in the [`ovh` notes](#ovh-ovhcloudcom--unverified).
+
+**`digitalocean` is unverified.** To promote it (do this when you have a live DigitalOcean
+panel open):
+
+1. Open **Networking → Domains → your domain → Create a record** and pick each type
+   (MX / SRV / TXT / CNAME) in turn.
+2. Confirm three things:
+   - The exact field labels in each form (the SRV dialog screenshot shows
+     `Hostname / Will direct to / Port / Priority / Weight`; the **MX / TXT / CNAME**
+     labels come from the docs — verify `Mail provider's mail server`, `TXT Value`, and
+     `Is an alias of`).
+   - **Apex Hostname** is `@` (what we ship), not blank.
+   - Whether **MX and CNAME targets need a trailing dot** (we ship one on all FQDN
+     targets; the SRV trailing-dot is confirmed live, MX/CNAME is inferred from
+     DigitalOcean's general "appends your domain to an unpunctuated target" behaviour).
+3. Fix `records.json` if anything differs, then remove the `UNVERIFIED —` prefixes
+   from the four `digitalocean` headers, and delete the unverified notes in
+   [`README.md`](README.md).
+
+`emilio.me` is DigitalOcean-hosted (NS `ns1`/`ns2`/`ns3.digitalocean.com`), so it is a
+ready-made target: `--resolver ns1.digitalocean.com` queries DigitalOcean authoritatively.
+Its 5 SRV records are currently *broken* — the target was entered without a trailing dot,
+so it came back as `mail.thundermail.com.emilio.me` — which both confirms the trailing-dot
+rule and makes fixing them a good end-to-end test of the emitted `digitalocean` SRV fixes.
 
 </details>
 

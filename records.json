@@ -185,6 +185,24 @@
         "fields": [["Type", "CNAME"], ["Hostname", "{host}"], ["Target Name", "{target}"]]
       }
     },
+    "digitalocean": {
+      "MX": {
+        "header": "UNVERIFIED — confirm the field names against your panel. DigitalOcean → Networking → Domains → select your domain → Create a record → Record Type MX. Hostname is @ for the root domain ('Use @ to create the record at the domain root'); enter the mail server with a trailing dot (DigitalOcean appends your domain otherwise):",
+        "fields": [["Type", "MX"], ["Hostname", "{host}"], ["Mail provider's mail server", "{target}."], ["Priority", "{priority}"]]
+      },
+      "SRV": {
+        "header": "UNVERIFIED — confirm the field names against your panel (the SRV layout is from a live Create-a-record screenshot). DigitalOcean → Networking → Domains → select your domain → Create a record → Record Type SRV. Keep the whole _service._protocol label in Hostname; enter 'Will direct to' (the target) WITH a trailing dot or DigitalOcean appends your domain:",
+        "fields": [["Type", "SRV"], ["Hostname", "{host}"], ["Will direct to", "{target}."], ["Port", "{port}"], ["Priority", "{priority}"], ["Weight", "{weight}"]]
+      },
+      "TXT": {
+        "header": "UNVERIFIED — confirm the field names against your panel. DigitalOcean → Networking → Domains → select your domain → Create a record → Record Type TXT (SPF is a plain TXT record here). Hostname is @ for the root domain:",
+        "fields": [["Type", "TXT"], ["Hostname", "{host}"], ["TXT Value", "{value}"]]
+      },
+      "CNAME": {
+        "header": "UNVERIFIED — confirm the field names against your panel. DigitalOcean → Networking → Domains → select your domain → Create a record → Record Type CNAME. Enter 'Is an alias of' WITH a trailing dot (DigitalOcean appends your domain otherwise):",
+        "fields": [["Type", "CNAME"], ["Hostname", "{host}"], ["Is an alias of", "{target}."]]
+      }
+    },
     "generic": {
       "MX": {
         "header": "Add this DNS record:",

@@ -115,6 +115,22 @@ The checked set is 13 records: 1 MX, 5 SRV (jmap/caldavs/carddavs/imaps/submissi
   `@`; the panel shows your domain beside the empty box). MX uses `Mail Server` for the
   target, TXT uses `Content`, CNAME uses `Target Name` (no trailing dot); Hover can't set
   a CNAME on the root, but every DKIM CNAME is on a subdomain so that's a non-issue.
+  `digitalocean` (**UNVERIFIED** — the **SRV** field layout is confirmed from a screenshot
+  of the live *Create a record* dialog; MX/TXT/CNAME labels come from DigitalOcean's
+  [manage-records docs](https://docs.digitalocean.com/products/networking/dns/how-to/manage-records/),
+  not a live add-record screenshot; drop the `UNVERIFIED —` prefixes once confirmed
+  end-to-end — `emilio.me` is the verify target, hosted on `ns1`/`ns2`/`ns3.digitalocean.com`).
+  A single **Create a record** dialog with a Record Type dropdown (like bunny/godaddy/hover).
+  Apex host is **`@`** (`{host}`) for MX/TXT, *not* blank. Unlike GoDaddy/IONOS/Hover it
+  keeps the whole `_service._protocol` label in **one** `Hostname` field — so SRV uses
+  `{host}`, not the split `{service}`/`{protocol}` tokens. The distinctive quirk: **any
+  target entered without a trailing dot gets your domain appended** (the SRV *Will direct
+  to* doc spells this out), so MX/SRV/CNAME targets are emitted as `{target}.` with the dot
+  (like `ovh`). This is confirmed live: `emilio.me`'s SRV targets were entered without the
+  dot and resolve as `mail.thundermail.com.emilio.me` — so its five SRV records are actually
+  broken (and, separately, the substring-match checker falsely reports them OK — see the
+  matching bug). MX field is `Mail provider's mail server`, TXT is `TXT Value`, CNAME is
+  `Is an alias of`; SPF/DKIM are plain TXT per the docs (DKIM here is a CNAME).
 - **Bookmarkable web URLs (web-only).** `app.js` mirrors the form state (domain /
   provider / resolver / fixformat) into the query string via `history.replaceState`,
   and on load repopulates the fields and auto-runs when a `domain` is present. This is

@@ -79,6 +79,8 @@
         <tr><td><code>godaddy</code></td><td>2026-07-14</td><td><strong>Unverified.</strong> From GoDaddy's help docs + a live SRV add-form screenshot; not confirmed end-to-end.</td></tr>
         <tr><td><code>ionos</code></td><td>2026-07-16</td><td><strong>Unverified.</strong> From IONOS's help docs + a live SRV add-form screenshot; not confirmed end-to-end.</td></tr>
         <tr><td><code>ovh</code></td><td>2026-07-16</td><td><strong>Unverified.</strong> From OVHcloud's help docs + a live TXT/SPF wizard screenshot; MX/SRV wizards not screenshotted.</td></tr>
+        <tr><td><code>hover</code></td><td>2026-07-20</td><td><strong>Unverified.</strong> From Hover's help docs + a live SRV Edit-DNS-Record screenshot; MX/TXT/CNAME not screenshotted.</td></tr>
+        <tr><td><code>digitalocean</code></td><td>2026-07-21</td><td><strong>Unverified.</strong> From DigitalOcean's help docs + a live SRV Create-a-record screenshot; trailing-dot rule confirmed live on emilio.me.</td></tr>
       </tbody>
     </table>
 
@@ -176,6 +178,20 @@
       ready-made target: <code>verify_thundermail_dns.py vntc.it</code> should report 13/13, and
       <code>--resolver ns200.anycast.me</code> queries OVH authoritatively.</p>
       <p>Details and reasoning are in the <a href="#ovh-ovhcloudcom--unverified"><code>ovh</code> notes</a>.</p>
+
+      <p><strong><code>digitalocean</code> is unverified.</strong> To promote it (do this when you have a live DigitalOcean panel open):</p>
+      <ol>
+        <li>Open <strong>Networking → Domains → your domain → Create a record</strong> and pick each type (MX / SRV / TXT / CNAME) in turn.</li>
+        <li>Confirm three things:
+          <ul>
+            <li>The exact field labels in each form (the SRV dialog screenshot shows <code>Hostname / Will direct to / Port / Priority / Weight</code>; the <strong>MX / TXT / CNAME</strong> labels come from the docs — verify <code>Mail provider's mail server</code>, <code>TXT Value</code>, and <code>Is an alias of</code>).</li>
+            <li><strong>Apex Hostname</strong> is <code>@</code> (what we ship), not blank.</li>
+            <li>Whether <strong>MX and CNAME targets need a trailing dot</strong> (we ship one on all FQDN targets; the SRV trailing-dot is confirmed live, MX/CNAME is inferred from DigitalOcean's general "appends your domain to an unpunctuated target" behaviour).</li>
+          </ul>
+        </li>
+        <li>Fix <code>records.json</code> if anything differs, then remove the <code>UNVERIFIED —</code> prefixes from the four <code>digitalocean</code> headers, and delete the unverified notes in <a href="https://github.com/thunderbird/dns-scripts/blob/main/README.md"><code>README.md</code></a>.</li>
+      </ol>
+      <p><code>emilio.me</code> is DigitalOcean-hosted (NS <code>ns1</code>/<code>ns2</code>/<code>ns3.digitalocean.com</code>), so it is a ready-made target: <code>--resolver ns1.digitalocean.com</code> queries DigitalOcean authoritatively. Its 5 SRV records are currently <em>broken</em> — the target was entered without a trailing dot, so it came back as <code>mail.thundermail.com.emilio.me</code> — which both confirms the trailing-dot rule and makes fixing them a good end-to-end test of the emitted <code>digitalocean</code> SRV fixes.</p>
     </details>
 
     <details>
