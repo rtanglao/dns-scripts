@@ -186,6 +186,16 @@ Exit status is `0` only when all 13 records are present and correct.
   which loads `app.js` in a `vm` sandbox) and asserts identical results — so when
   you change the interpreter in one language, update the other or this test fails.
   Add a fixture case whenever you add an interpreter token or `match_mode`.
+  ⚠️ **Harness fragility (by design):** `run_js.mjs` relies on `app.js`'s *only*
+  top-level side effect being the trailing `loadConfig().then(...)`, which it
+  neutralizes by stubbing `fetch` to stay pending (so the DOM-touching callback
+  never fires). If you add **new top-level (module-load-time) code to `app.js`**
+  that touches `document`/`window`/`location`/etc., the sandbox stubs in
+  `run_js.mjs` must be extended to match, or the parity test errors at load. This
+  is intentional pressure to keep `app.js`'s pure interpreter functions free of
+  load-time DOM coupling — but it means "just added a line to app.js" can surface
+  as a parity-harness failure rather than an obvious app bug; check `run_js.mjs`'s
+  stubs first in that case.
 - **CLI regression:** normal-input output should stay byte-identical across
   refactors. Capture `glamrocnamecheap.com` (expect 13/13, exit 0) and
   `example.com --provider namecheap|squarespace|cosmotown|generic` before a change, then

@@ -21,6 +21,9 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(here, "..", "..");
 const appSrc = fs.readFileSync(path.join(repoRoot, "app.js"), "utf8");
 
+// NOTE: this sandbox assumes app.js's only load-time side effect is the trailing
+// `loadConfig().then(...)`. If app.js gains new top-level code touching the DOM or
+// other browser globals, extend these stubs to match (see CLAUDE.md → Testing).
 const noop = () => {};
 const domNode = { addEventListener: noop, appendChild: noop, replaceChildren: noop };
 const sandbox = {
