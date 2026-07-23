@@ -131,6 +131,24 @@ The checked set is 13 records: 1 MX, 5 SRV (jmap/caldavs/carddavs/imaps/submissi
   broken (and, separately, the substring-match checker falsely reports them OK — see the
   matching bug). MX field is `Mail provider's mail server`, TXT is `TXT Value`, CNAME is
   `Is an alias of`; SPF/DKIM are plain TXT per the docs (DKIM here is a CNAME).
+  `porkbun` (**UNVERIFIED** — MX/TXT/CNAME field layout from Porkbun's KB
+  [article 231](https://kb.porkbun.com/article/231-how-to-add-dns-records-on-porkbun)
+  and SRV from [article 109](https://kb.porkbun.com/article/109-how-to-create-an-srv-record)
+  (screenshots), not confirmed end-to-end on a live panel; drop the `UNVERIFIED —` prefixes
+  once confirmed — `wrportal.net` is the verify target, hosted on
+  `curitiba`/`fortaleza`/`maceio`/`salvador.ns.porkbun.com`, so
+  `--resolver curitiba.ns.porkbun.com` queries it authoritatively). A single **Add Record**
+  dialog with a Type dropdown (like bunny/godaddy/hover/digitalocean); Porkbun DNS is
+  Cloudflare-backed. Apex host is left **blank** (`{subhost}`), *not* `@` — the
+  bunny/cosmotown/ovh pattern. Like DigitalOcean it keeps the whole `_service._protocol`
+  label in **one** `Host` field (SRV uses `{host}`, not the split tokens). MX and SRV show a
+  separate **Priority** field, and the SRV **Answer** field packs Weight/Port/Target on one
+  line (`{value}`, the squarespace-style split). Unlike `ovh`/`digitalocean`, targets are
+  stored **verbatim with no trailing dot** — confirmed live on `wrportal.net` (its MX and
+  DKIM CNAME targets came back unappended), so MX/SRV/CNAME emit plain `{target}` like
+  `bunny`. Value field is labelled contextually in the UI (`IPv4 Address`/`Target`/`Answer`);
+  we emit `Answer` for MX/SRV/TXT and `Target` for CNAME. SPF/DKIM are plain TXT (DKIM is a
+  CNAME here).
 - **Bookmarkable web URLs (web-only).** `app.js` mirrors the form state (domain /
   provider / resolver / fixformat) into the query string via `history.replaceState`,
   and on load repopulates the fields and auto-runs when a `domain` is present. This is

@@ -203,6 +203,24 @@
         "fields": [["Type", "CNAME"], ["Hostname", "{host}"], ["Is an alias of", "{target}"]]
       }
     },
+    "porkbun": {
+      "MX": {
+        "header": "UNVERIFIED — confirm the field labels against your panel. Porkbun → domain list → the DNS button under your domain → Manage DNS Records → + Add Record → Type MX. Leave Host BLANK for the root domain (Porkbun shows '.yourdomain' beside it; do NOT type @). MX shows a separate Priority field; targets do NOT need a trailing dot (Porkbun stores them verbatim):",
+        "fields": [["Type", "MX"], ["Host", "{subhost}"], ["Priority", "{priority}"], ["Answer", "{target}"]]
+      },
+      "SRV": {
+        "header": "UNVERIFIED — confirm the field labels against your panel (SRV form per Porkbun KB article 109). Porkbun → the DNS button under your domain → Manage DNS Records → + Add Record → Type SRV. Keep the whole _service._protocol label in Host; Priority is its own field; put Weight, Port and Target together in Answer (space-separated):",
+        "fields": [["Type", "SRV"], ["Host", "{host}"], ["Priority", "{priority}"], ["Answer", "{value}"]]
+      },
+      "TXT": {
+        "header": "UNVERIFIED — confirm the field labels against your panel. Porkbun → the DNS button under your domain → Manage DNS Records → + Add Record → Type TXT. Leave Host BLANK for the root domain (do NOT type @):",
+        "fields": [["Type", "TXT"], ["Host", "{subhost}"], ["Answer", "{value}"]]
+      },
+      "CNAME": {
+        "header": "UNVERIFIED — confirm the field labels against your panel. Porkbun → the DNS button under your domain → Manage DNS Records → + Add Record → Type CNAME. Enter the DKIM host label in Host; the Target does NOT need a trailing dot (Porkbun stores it verbatim):",
+        "fields": [["Type", "CNAME"], ["Host", "{subhost}"], ["Target", "{target}"]]
+      }
+    },
     "generic": {
       "MX": {
         "header": "Add this DNS record:",

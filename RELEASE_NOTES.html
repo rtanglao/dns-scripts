@@ -81,6 +81,7 @@
         <tr><td><code>ovh</code></td><td>2026-07-16</td><td><strong>Unverified.</strong> From OVHcloud's help docs + a live TXT/SPF wizard screenshot; MX/SRV wizards not screenshotted.</td></tr>
         <tr><td><code>hover</code></td><td>2026-07-20</td><td><strong>Unverified.</strong> From Hover's help docs + a live SRV Edit-DNS-Record screenshot; MX/TXT/CNAME not screenshotted.</td></tr>
         <tr><td><code>digitalocean</code></td><td>2026-07-21</td><td><strong>Unverified.</strong> From DigitalOcean's help docs + a live SRV Create-a-record screenshot; trailing-dot rule confirmed live on emilio.me.</td></tr>
+        <tr><td><code>porkbun</code></td><td>2026-07-23</td><td><strong>Unverified.</strong> From Porkbun's KB add-record (231) + SRV (109) articles; no-trailing-dot confirmed live on wrportal.net.</td></tr>
       </tbody>
     </table>
 
@@ -192,6 +193,20 @@
         <li>Fix <code>records.json</code> if anything differs, then remove the <code>UNVERIFIED —</code> prefixes from the four <code>digitalocean</code> headers, and delete the unverified notes in <a href="https://github.com/thunderbird/dns-scripts/blob/main/README.md"><code>README.md</code></a>.</li>
       </ol>
       <p><code>emilio.me</code> is DigitalOcean-hosted (NS <code>ns1</code>/<code>ns2</code>/<code>ns3.digitalocean.com</code>), so it is a ready-made target: <code>--resolver ns1.digitalocean.com</code> queries DigitalOcean authoritatively. Its 5 SRV records are currently <em>broken</em> — the target was entered without a trailing dot, so it came back as <code>mail.thundermail.com.emilio.me</code> — which both confirms the trailing-dot rule and makes fixing them a good end-to-end test of the emitted <code>digitalocean</code> SRV fixes.</p>
+
+      <p><strong><code>porkbun</code> is unverified.</strong> To promote it (do this when you have a live Porkbun panel open):</p>
+      <ol>
+        <li>Open the <strong>DNS</strong> button under your domain → <strong>Manage DNS Records → + Add Record</strong> and pick each type (MX / SRV / TXT / CNAME) in turn.</li>
+        <li>Confirm three things:
+          <ul>
+            <li>The exact value-field label per type (we ship <code>Answer</code> for MX/SRV/TXT and <code>Target</code> for CNAME; the UI labels it contextually — <code>IPv4 Address</code>, <code>Target</code>, <code>Answer / Value</code>).</li>
+            <li><strong>Apex Host</strong> is left <strong>blank</strong> (what we ship), not <code>@</code>; and MX/SRV show a separate <strong>Priority</strong> field with Weight/Port/Target packed into the SRV Answer.</li>
+            <li>Whether targets tolerate no trailing dot (we ship targets verbatim, no dot) — confirmed live for MX/CNAME on <code>wrportal.net</code>; re-confirm for SRV once SRV records exist there.</li>
+          </ul>
+        </li>
+        <li>Fix <code>records.json</code> if anything differs, then remove the <code>UNVERIFIED —</code> prefixes from the four <code>porkbun</code> headers, and delete the unverified notes in <a href="https://github.com/thunderbird/dns-scripts/blob/main/README.md"><code>README.md</code></a>.</li>
+      </ol>
+      <p><code>wrportal.net</code> is Porkbun-hosted (NS <code>curitiba</code>/<code>fortaleza</code>/<code>maceio</code>/<code>salvador.ns.porkbun.com</code>), so it is a ready-made target: <code>--resolver curitiba.ns.porkbun.com</code> queries Porkbun authoritatively. Its MX/TXT/CNAME records are already correct (8/13); its 5 SRV records aren't added yet, so adding them there is a good end-to-end test of the emitted <code>porkbun</code> SRV fixes.</p>
     </details>
 
     <details>

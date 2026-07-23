@@ -78,7 +78,7 @@ uv run verify_thundermail_dns.py <domain> --resolver kiki.bunny.net
 Pass `--provider` to print, for each **failing** record, exactly what to enter in
 that DNS provider's control panel — including provider-specific quirks such as how
 the Host/Name field is written. Supported: `namecheap`, `squarespace`, `cosmotown`,
-`bunny`, `spaceship`, `godaddy`, `ionos`, `ovh`, `hover`, `digitalocean`, `generic`. bunny.net's add-record form has a single
+`bunny`, `spaceship`, `godaddy`, `ionos`, `ovh`, `hover`, `digitalocean`, `porkbun`, `generic`. bunny.net's add-record form has a single
 **Value** field (no separate Priority/Weight/Port), so the `bunny` MX/SRV output puts
 the whole record string in Value; the Hostname field is left empty for the root
 ([bunny.net: DNS records](https://docs.bunny.net/docs/dns-records)). **`spaceship`
@@ -118,7 +118,18 @@ GoDaddy/IONOS/Hover), uses `@` for the root (MX/TXT), and **appends your domain 
 target entered without a trailing dot** — so the `digitalocean` MX/SRV/CNAME output ends
 targets with a `.` (like `ovh`). This trailing-dot behaviour is confirmed live on
 `emilio.me`, whose SRV targets were entered without the dot and came back as
-`mail.thundermail.com.emilio.me`. Note that
+`mail.thundermail.com.emilio.me`. **`porkbun` is also unverified** — its MX/TXT/CNAME
+field layout comes from Porkbun's KB article
+[How to Add DNS Records](https://kb.porkbun.com/article/231-how-to-add-dns-records-on-porkbun)
+and its SRV layout from the
+[SRV record guide](https://kb.porkbun.com/article/109-how-to-create-an-srv-record)
+(screenshots, but not confirmed end-to-end on a live panel), so its headers flag this.
+Porkbun (Cloudflare-backed) uses a single Add-record dialog with a Type dropdown: the
+**Host** field is left **blank** for the root (not `@`), MX and SRV have a separate
+**Priority** field, and SRV keeps the whole `_service._protocol` label in one Host with
+Weight/Port/Target packed into the Answer field. Unlike `ovh`/`digitalocean`, targets do
+**not** need a trailing dot — confirmed live on `wrportal.net`, whose MX and DKIM CNAME
+targets came back verbatim (Porkbun stores them as entered). Note that
 Cosmotown's customer panel has no SRV section, so the five SRV
 records can't be self-served — the `cosmotown` output routes you to Cosmotown support
 for those. See Cosmotown's docs for
